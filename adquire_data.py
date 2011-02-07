@@ -14,7 +14,7 @@ def getcomiclist():
     
     comiclist = [] 
 
-    with open('comicslist.txt') as f:
+    with open('test data\\comicslist.txt') as f:
         comiclist_temp = list(f.readlines())
     
     for i in comiclist_temp:
