@@ -1,0 +1,36 @@
+Series,Number,Year
+28 Days Later,19,2011
+1994,21,1981
+1994,22,1981
+1994,23,1982
+2000AD,1715,-1
+2000AD,1716,-1
+20000 AD Presents - Stone Island,7,2008
+A John Stanley Ha Ha Ha Ha Ha Halloween Treat,,2010
+The Acme Novelty Library,20,2010
+Action Comics,579,-1
+Adventure Comics,522,2011
+Adventure Comics,522,2011
+Adventure Comics,522,2011
+Adventure Comics,522,2011
+The Adventures of Snake Plissken,,1997
+All New Batman Brave & the Bold,2,2011
+All New Batman Brave & the Bold,2,2011
+All New Batman Brave & the Bold,3,2011
+All New Collector's Edition,62,1979
+Alpha Flight,13,1998
+The Amazing Spider-Man,648,2011
+The Amazing Spider-Man,649,2011
+The Amazing Spider-Man,650,2011
+The Amazing Spider-Man,651,2011
+The Amazing Spider-Man,651,2011
+The Amazing Spider-Man,651,2011
+The Amazing Spider-Man,651,2011
+The Amazing Spider-Man,652,2011
+The Amazing Spider-Man,652,2011
+American Vampire,10,2011
+The Amory Wars - In Keeping Secrets of Silent Earth 3,7,2010
+Angelus,6,2010
+Anita Blake - Circus of the Damned - The Ingenue,1,2011
+Anita Blake - Circus of the Damned - The Ingenue,1,2011
+Ant-Man & Wasp,3,2011
