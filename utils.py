@@ -5,18 +5,16 @@ This module contains a variety of generally useful utility methods.
 '''
 
 
-import clr
 import re
-import sys
 
-clr.AddReference('System')
-from System.IO import File
+# clr.AddReference('System')
+# from System.IO import File
 
-clr.AddReference('System.Drawing')
-from System.Drawing import Graphics, Bitmap
+# clr.AddReference('System.Drawing')
+# from System.Drawing import Graphics, Bitmap
 
-clr.AddReference('IronPython')
-from IronPython.Compiler import CallTarget0 
+# clr.AddReference('IronPython')
+# from IronPython.Compiler import CallTarget0 
 
 #==============================================================================
 def convert_roman_numerals(num_s):
@@ -87,7 +85,7 @@ def convert_number_words(phrase_s, expand_b):
 
 
 #==============================================================================
-def __cleanup_series(series_name, alt_b):
+def __cleanup_series(series_name):
    '''
    Returns a cleaned up version of the given search terms.  The terms are 
    cleaned by removing, replacing, and massaging certain keywords to make the
@@ -105,8 +103,7 @@ def __cleanup_series(series_name, alt_b):
    series_name = series_name.replace('_', ' ')
    series_name = series_name.replace('-', ' ')
    series_name = series_name.replace("'", ' ')
-   series_name = re.sub(r'\b(vs\.?|versus|and|or|the|an|of|a|is)\b',
-      '', series_name)
+   series_name = re.sub(r'\b(vs\.?|versus|and|or|the|an|of|a|is)\b','', series_name)
    series_name = re.sub(r'giantsize', r'giant size', series_name)
    series_name = re.sub(r'giant[- ]*sized', r'giant size', series_name)
    series_name = re.sub(r'kingsize', r'king size', series_name)
@@ -121,15 +118,15 @@ def __cleanup_series(series_name, alt_b):
 
    # try to expand single number
    # words, and if that fails, try to contract them.
-   orig_series_name = series_name
-   if alt_b:
-      series_name = utils.convert_number_words(series_name, True)
-   if alt_b and series_name == orig_series_name:
-      series_name = utils.convert_number_words(series_name, False)
+   # orig_series_name = series_name
+   # if alt_b:
+      # series_name = utils.convert_number_words(series_name, True)
+   # if alt_b and series_name == orig_series_name:
+      # series_name = utils.convert_number_words(series_name, False)
       
-   # strip out punctuation
-   word = re.compile(r'[\w]{1,}')
-   series_name = ' '.join(word.findall(series_name))
+   # # strip out punctuation
+   # word = re.compile(r'[\w]{1,}')
+   # series_name = ' '.join(word.findall(series_name))
    
    return series_name
    
