@@ -17,7 +17,9 @@
 
 #       pagecount   keep    largest
 #       pagecount   keep    smallest
-#       pagecount   keep    largest-noads
+#       pagecount   keep    noads
+#       pagecount   keep    c2c
+#       pagecount   remove  fileless
 
 
 
@@ -34,7 +36,7 @@ from process_dupes import *
 
 logfile = open('logfile.log','w')
 
-(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH) = range(9)
+(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,BOOK) = range(10)
 
 comiclist = getcomiclist()
 comiclist.pop(0)
@@ -268,7 +270,7 @@ for i in range(len(dupe_groups)):
     t_group = dupe_groups[i][:]
 
     if len(t_group)>1:   # process group only if there is more than one comic
-        t_group = keep_pagecount_largest(PAGECOUNT, t_group, logfile)
+        t_group = keep_pagecount_c2c(PAGECOUNT, t_group, logfile)
         
     dupe_groups[i] = t_group[:]
 
