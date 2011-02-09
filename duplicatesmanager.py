@@ -253,7 +253,19 @@ def DuplicatesManager(books):
         t_group = dupe_groups[i][:]
 
         if len(t_group)>1:   # process group only if there is more than one comic
-           t_group = keep_pagecount_smallest(t_group, logfile)          
+           #t_group = keep_covers_most(True,t_group, logfile)          
+		   #t_group = keep_covers_most(False,t_group, logfile)          
+		   #t_group = keep_pagecount_fileless(t_group, logfile)          
+		   #t_group = keep_filesize_largest(t_group,logfile)
+		   #t_group = keep_filesize_smallest(t_group,logfile)
+		   t_group = keep_with_word('C2C', [TAGS], t_group, logfile)
+		   #t_group = remove_with_word('c2c', [FILENAME], t_group, logfile)
+		   #t_group = 
+		   #t_group = 
+		   #t_group = 
+		   #t_group = 
+		   #t_group = 
+		   #t_group = 
         dupe_groups[i] = t_group[:]
 
     #temp_groups = dupe_groups[:]
@@ -301,170 +313,43 @@ def LoadRules(logfile):
 
 
         
-def __cleanup_series(series_name):
-    # All of the symbols below cause inconsistency in title searches
-    series_name = series_name.lower()
-    series_name = series_name.replace('.', '')
-    series_name = series_name.replace('_', ' ')
-    series_name = series_name.replace('-', ' ')
-    series_name = series_name.replace("'", ' ')
-    series_name = re.sub(r'\b(vs\.?|versus|and|or|the|an|of|a|is)\b','', series_name)
-    series_name = re.sub(r'giantsize', r'giant size', series_name)
-    series_name = re.sub(r'giant[- ]*sized', r'giant size', series_name)
-    series_name = re.sub(r'kingsize', r'king size', series_name)
-    series_name = re.sub(r'king[- ]*sized', r'king size', series_name)
-    series_name = re.sub(r"directors", r"director's", series_name)
-    series_name = re.sub(r"\bvolume\b", r"\bvol\b", series_name)
-    series_name = re.sub(r"\bvol\.\b", r"\bvol\b", series_name)
+# def __cleanup_series(series_name):
+    # # All of the symbols below cause inconsistency in title searches
+    # series_name = series_name.lower()
+    # series_name = series_name.replace('.', '')
+    # series_name = series_name.replace('_', ' ')
+    # series_name = series_name.replace('-', ' ')
+    # series_name = series_name.replace("'", ' ')
+    # series_name = re.sub(r'\b(vs\.?|versus|and|or|the|an|of|a|is)\b','', series_name)
+    # series_name = re.sub(r'giantsize', r'giant size', series_name)
+    # series_name = re.sub(r'giant[- ]*sized', r'giant size', series_name)
+    # series_name = re.sub(r'kingsize', r'king size', series_name)
+    # series_name = re.sub(r'king[- ]*sized', r'king size', series_name)
+    # series_name = re.sub(r"directors", r"director's", series_name)
+    # series_name = re.sub(r"\bvolume\b", r"\bvol\b", series_name)
+    # series_name = re.sub(r"\bvol\.\b", r"\bvol\b", series_name)
 
-   #series_name = re.sub(r'gijoe', r'gi joe', series_name)
+   # #series_name = re.sub(r'gijoe', r'gi joe', series_name)
    
-    series_name = re.sub(r' *', r'', series_name)
+    # series_name = re.sub(r' *', r'', series_name)
 
-   # try to expand single number
-   # words, and if that fails, try to contract them.
-   # orig_series_name = series_name
-   # if alt_b:
-      # series_name = utils.convert_number_words(series_name, True)
-   # if alt_b and series_name == orig_series_name:
-      # series_name = utils.convert_number_words(series_name, False)
+   # # try to expand single number
+   # # words, and if that fails, try to contract them.
+   # # orig_series_name = series_name
+   # # if alt_b:
+      # # series_name = utils.convert_number_words(series_name, True)
+   # # if alt_b and series_name == orig_series_name:
+      # # series_name = utils.convert_number_words(series_name, False)
       
-   # # strip out punctuation
-   # word = re.compile(r'[\w]{1,}')
-   # series_name = ' '.join(word.findall(series_name))
+   # # # strip out punctuation
+   # # word = re.compile(r'[\w]{1,}')
+   # # series_name = ' '.join(word.findall(series_name))
    
     return series_name
    
 
 
 
-###################################################################################################
-##
-### ================ PAGECOUNT FUNCTIONS ==========================================================
-##
-##
-##def keep_pagecount_noads(dgroup, logfile):
-##    ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)'''
-##    
-##    logfile.write('_________________KEEP_PAGECOUNT_NOADS______________\n')
-##
-##    to_keep = []
-##    to_remove =[]
-##
-##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
-##           
-##    i=0                               #keeps the first one
-##    to_keep.append(by_size[i])
-##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-##           
-##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) < (int(by_size[i][PAGECOUNT]) + C2C_NOADS_GAP)):
-##            to_keep.append(by_size[i+1])
-##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n')
-##            i = i+1
-##    for j in range (i+1,len(by_size)):
-##        to_remove.append(by_size[j])
-##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-##            
-##    delcomics(to_remove)    
-##    dgroup = to_keep[:]
-##    
-##    return dgroup
-##
-##
-##def keep_pagecount_c2c(dgroup, logfile):
-##    ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)'''
-##    
-##    logfile.write('_________________KEEP_PAGECOUNT_C2C______________\n')
-##
-##    to_keep = []
-##    to_remove = []
-##
-##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by filesize of covers
-##           
-##    i=0                               #keeps the first one
-##    to_keep.append(by_size[i])
-##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-##         
-## 
-##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) > (int(by_size[i][PAGECOUNT]) - int(C2C_NOADS_GAP))):
-##            to_keep.append(by_size[i+1])
-##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-##            i = i+1
-##    for j in range (i+1,len(by_size)):
-##        to_remove.append(by_size[j])
-##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-##            
-##    delcomics(to_remove)
-##    dgroup = to_keep[:]
-##    
-##    return dgroup
-##
-##
-##def keep_pagecount_largest(dgroup, logfile):
-##    ''' Keeps from the 'group' the one with most pages'''
-##    
-##    logfile.write('_________________KEEP_PAGECOUNT_MOST______________\n')
-##
-##    to_keep = []
-##    to_remove = []     
-##
-##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by number of pages
-##
-##    i=0                               #keeps the first one
-##    to_keep.append(by_size[i])
-##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-##    
-##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
-##            to_keep.append(by_size[i+1])
-##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-##            i = i+1
-##    for j in range (i+1,len(by_size)):
-##        to_remove.append(by_size[j])
-##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-##                      
-##    
-##    delcomics(to_remove)
-##    dgroup = to_keep[:]
-##    
-##    return dgroup
-##
-##
-##def keep_pagecount_smallest(dgroup, logfile):
-##    ''' Keeps from the 'group' the one with less pages'''
-##    
-##    logfile.write('_________________KEEP_PAGECOUNT_LESS______________\n')
-##    
-##    to_keep =[]
-##    to_remove = []  
-##    
-##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by number of pages
-##                         
-##    i=0                               #keeps the first one
-##    to_keep.append(by_size[i])
-##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-##    
-##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
-##            to_keep.append(by_size[i+1])
-##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-##            i = i+1
-##    for j in range (i+1,len(by_size)):
-##        to_remove.append(by_size[j])
-##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-##                      
-##    
-##    delcomics(to_remove)
-##    dgroup = to_keep[:]
-##    return dgroup
-##
-##
-#####################################################################################################
-
-
-def delcomics(comicslist):
-    return
-
-
-####################################################
 
 class NoRulesFileException(Exception):
         pass

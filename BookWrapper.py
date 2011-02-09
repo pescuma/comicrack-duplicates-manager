@@ -168,11 +168,11 @@ class BookWrapper:
 		ret = self.raw.ShadowFormat
 		if ret:
 			return ret
-		return Translate('Series')
+		return 'Series'
 
 	def GetFileFormat(self):
 		if not self.raw.FilePath:
-			return Translate('Fileless')
+			return 'Fileless'
 		ret = self.raw.FileFormat
 		if ret:
 			return ret
@@ -183,13 +183,13 @@ class BookWrapper:
 
 	def GetFilePath(self):
 		if not self.raw.FilePath:
-			return Translate('Fileless')
+			return 'Fileless'
 		ret = self.raw.FilePath
 		return ret
 
 	def GetFileName(self):
 		if not self.raw.FileNameWithExtension:
-			return Translate('Fileless')
+			return 'Fileless'
 		ret = self.raw.FileNameWithExtension
 		return ret
 
