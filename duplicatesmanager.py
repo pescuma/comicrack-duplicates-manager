@@ -52,7 +52,7 @@ VERSION= "0.1"
 SCRIPTDIRECTORY = __file__[0:-len("duplicatesmanager.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
 LOGFILE = Path.Combine(SCRIPTDIRECTORY, "logfile.log")
-(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,BOOK) = range(10)
+(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,BOOK) = range(11)
 C2C_NOADS_GAP = 5
 
 VERBOSE = False
@@ -99,7 +99,7 @@ def DuplicatesManager(books):
     for book in books:
         
         b = BookWrapper(book)
-        comiclist.append((cleanupseries(b.Series),b.Number,b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,book))
+        comiclist.append((cleanupseries(b.Series),b.Number,b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
