@@ -30,6 +30,10 @@ from System.Windows.Forms import DialogResult, MessageBox, MessageBoxButtons, Me
 from itertools import groupby
 from BookWrapper import *
 from utilsbycory import cleanupseries
+from processfunctions import *
+
+from constants import *
+
 #from process_dupes import *
 
 '''TODO: BookWrapper by XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'''
@@ -40,28 +44,28 @@ from utilsbycory import cleanupseries
 #
 ##########
 
-'''----------------------------------------------------------'''
-
-##########
-#
-#   DEFINITIONS
-
-
-VERSION= "0.1"
-
-SCRIPTDIRECTORY = __file__[0:-len("duplicatesmanager.py")]
-RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
-LOGFILE = Path.Combine(SCRIPTDIRECTORY, "logfile.log")
-(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,BOOK) = range(11)
-C2C_NOADS_GAP = 5
-
-VERBOSE = False
-
-#
-#
-###########
-
-'''---------------------------------------------------------'''
+##'''----------------------------------------------------------'''
+##
+############
+###
+###   DEFINITIONS
+##
+##
+##VERSION= "0.1"
+##
+##SCRIPTDIRECTORY = __file__[0:-len("duplicatesmanager.py")]
+##RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
+##LOGFILE = Path.Combine(SCRIPTDIRECTORY, "logfile.log")
+##(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,BOOK) = range(11)
+##C2C_NOADS_GAP = 5
+##
+##VERBOSE = False
+##
+###
+###
+#############
+##
+##'''---------------------------------------------------------'''
 
 
 ############
@@ -334,126 +338,126 @@ def __cleanup_series(series_name):
 
 
 
-#################################################################################################
-
-# ================ PAGECOUNT FUNCTIONS ==========================================================
-
-
-def keep_pagecount_noads(dgroup, logfile):
-    ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)'''
-    
-    logfile.write('_________________KEEP_PAGECOUNT_NOADS______________\n')
-
-    to_keep = []
-    to_remove =[]
-
-    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
-           
-    i=0                               #keeps the first one
-    to_keep.append(by_size[i])
-    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-           
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) < (int(by_size[i][PAGECOUNT]) + C2C_NOADS_GAP)):
-            to_keep.append(by_size[i+1])
-            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n')
-            i = i+1
-    for j in range (i+1,len(by_size)):
-        to_remove.append(by_size[j])
-        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-            
-    delcomics(to_remove)    
-    dgroup = to_keep[:]
-    
-    return dgroup
-
-
-def keep_pagecount_c2c(dgroup, logfile):
-    ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)'''
-    
-    logfile.write('_________________KEEP_PAGECOUNT_C2C______________\n')
-
-    to_keep = []
-    to_remove = []
-
-    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by filesize of covers
-           
-    i=0                               #keeps the first one
-    to_keep.append(by_size[i])
-    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-         
- 
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) > (int(by_size[i][PAGECOUNT]) - int(C2C_NOADS_GAP))):
-            to_keep.append(by_size[i+1])
-            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-            i = i+1
-    for j in range (i+1,len(by_size)):
-        to_remove.append(by_size[j])
-        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-            
-    delcomics(to_remove)
-    dgroup = to_keep[:]
-    
-    return dgroup
-
-
-def keep_pagecount_largest(dgroup, logfile):
-    ''' Keeps from the 'group' the one with most pages'''
-    
-    logfile.write('_________________KEEP_PAGECOUNT_MOST______________\n')
-
-    to_keep = []
-    to_remove = []     
-
-    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by number of pages
-
-    i=0                               #keeps the first one
-    to_keep.append(by_size[i])
-    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-    
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
-            to_keep.append(by_size[i+1])
-            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-            i = i+1
-    for j in range (i+1,len(by_size)):
-        to_remove.append(by_size[j])
-        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-                      
-    
-    delcomics(to_remove)
-    dgroup = to_keep[:]
-    
-    return dgroup
-
-
-def keep_pagecount_smallest(dgroup, logfile):
-    ''' Keeps from the 'group' the one with less pages'''
-    
-    logfile.write('_________________KEEP_PAGECOUNT_LESS______________\n')
-    
-    to_keep =[]
-    to_remove = []  
-    
-    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by number of pages
-                         
-    i=0                               #keeps the first one
-    to_keep.append(by_size[i])
-    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-    
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
-            to_keep.append(by_size[i+1])
-            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-            i = i+1
-    for j in range (i+1,len(by_size)):
-        to_remove.append(by_size[j])
-        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-                      
-    
-    delcomics(to_remove)
-    dgroup = to_keep[:]
-    return dgroup
-
-
 ###################################################################################################
+##
+### ================ PAGECOUNT FUNCTIONS ==========================================================
+##
+##
+##def keep_pagecount_noads(dgroup, logfile):
+##    ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)'''
+##    
+##    logfile.write('_________________KEEP_PAGECOUNT_NOADS______________\n')
+##
+##    to_keep = []
+##    to_remove =[]
+##
+##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
+##           
+##    i=0                               #keeps the first one
+##    to_keep.append(by_size[i])
+##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
+##           
+##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) < (int(by_size[i][PAGECOUNT]) + C2C_NOADS_GAP)):
+##            to_keep.append(by_size[i+1])
+##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n')
+##            i = i+1
+##    for j in range (i+1,len(by_size)):
+##        to_remove.append(by_size[j])
+##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
+##            
+##    delcomics(to_remove)    
+##    dgroup = to_keep[:]
+##    
+##    return dgroup
+##
+##
+##def keep_pagecount_c2c(dgroup, logfile):
+##    ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)'''
+##    
+##    logfile.write('_________________KEEP_PAGECOUNT_C2C______________\n')
+##
+##    to_keep = []
+##    to_remove = []
+##
+##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by filesize of covers
+##           
+##    i=0                               #keeps the first one
+##    to_keep.append(by_size[i])
+##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
+##         
+## 
+##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) > (int(by_size[i][PAGECOUNT]) - int(C2C_NOADS_GAP))):
+##            to_keep.append(by_size[i+1])
+##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
+##            i = i+1
+##    for j in range (i+1,len(by_size)):
+##        to_remove.append(by_size[j])
+##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
+##            
+##    delcomics(to_remove)
+##    dgroup = to_keep[:]
+##    
+##    return dgroup
+##
+##
+##def keep_pagecount_largest(dgroup, logfile):
+##    ''' Keeps from the 'group' the one with most pages'''
+##    
+##    logfile.write('_________________KEEP_PAGECOUNT_MOST______________\n')
+##
+##    to_keep = []
+##    to_remove = []     
+##
+##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by number of pages
+##
+##    i=0                               #keeps the first one
+##    to_keep.append(by_size[i])
+##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
+##    
+##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
+##            to_keep.append(by_size[i+1])
+##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
+##            i = i+1
+##    for j in range (i+1,len(by_size)):
+##        to_remove.append(by_size[j])
+##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
+##                      
+##    
+##    delcomics(to_remove)
+##    dgroup = to_keep[:]
+##    
+##    return dgroup
+##
+##
+##def keep_pagecount_smallest(dgroup, logfile):
+##    ''' Keeps from the 'group' the one with less pages'''
+##    
+##    logfile.write('_________________KEEP_PAGECOUNT_LESS______________\n')
+##    
+##    to_keep =[]
+##    to_remove = []  
+##    
+##    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by number of pages
+##                         
+##    i=0                               #keeps the first one
+##    to_keep.append(by_size[i])
+##    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
+##    
+##    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
+##            to_keep.append(by_size[i+1])
+##            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
+##            i = i+1
+##    for j in range (i+1,len(by_size)):
+##        to_remove.append(by_size[j])
+##        logfile.write('removed... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
+##                      
+##    
+##    delcomics(to_remove)
+##    dgroup = to_keep[:]
+##    return dgroup
+##
+##
+#####################################################################################################
 
 
 def delcomics(comicslist):
