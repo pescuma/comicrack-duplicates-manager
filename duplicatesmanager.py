@@ -1,12 +1,12 @@
 #####################################################################################################
 ##
-##	duplicatesmanager.py
+##      duplicatesmanager.py
 ##
-##	Author: perezmu
+##      Author: perezmu
 ##
-##	Copyleft perezmu 2011. 
+##      Copyleft perezmu 2011. 
 ##
-##	Icon -> created from http://findicons.com/icon/25565/cancel & http://findicons.com/icon/16770/copy#
+##      Icon -> created from http://findicons.com/icon/25565/cancel & http://findicons.com/icon/16770/copy#
 ##
 ######################################################################################################
 
@@ -137,88 +137,88 @@ def DuplicatesManager(books):
         comiclist.sort()
         ''' begin sorting and sort the list '''
 
-	        # TODO: I need to cleanup the series names and issues 1/2, 0.5, etc...
-	        # TODO: Also, check for CVDB items first!
+                # TODO: I need to cleanup the series names and issues 1/2, 0.5, etc...
+                # TODO: Also, check for CVDB items first!
 
         cl = {}
         ''' temp dictionary'''
         for key, group in groupby(comiclist, lambda x: x[SERIES]):
-        	cl[key] = list(group)
-        	'''groups by series'''
-        	''' cl is a dictionary that now has 'series' as keys'''
-        	''' we remove series with only one ecomic '''
+                cl[key] = list(group)
+                '''groups by series'''
+                ''' cl is a dictionary that now has 'series' as keys'''
+                ''' we remove series with only one ecomic '''
         
-        logfile.write('============= Begining dupes identification ==================================\n\n')        	
+        logfile.write('============= Begining dupes identification ==================================\n\n')             
         
         logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
         logfile.write('Found '+str(len(cl))+ ' different series\n')
-		
+                
         if VERBOSE:
             for series in sorted(cl.keys()):
-			    logfile.write('\t'+series+'\n')
-		
+                            logfile.write('\t'+series+'\n')
+                
         remove = []
         for series in cl.keys():
-        	if len(cl[series])==1:
-				remove.append(series)   
+                if len(cl[series])==1:
+                                remove.append(series)   
         for series in remove:
-        	del cl[series]
+                del cl[series]
         logfile.write('Found '+str(len(cl))+ ' different series with more than one issue\n')
-		
+                
         if VERBOSE:
             for series in sorted(cl.keys()):
-			    logfile.write('\t'+series+'\n')
-		
+                            logfile.write('\t'+series+'\n')
+                
         ''' we now regroup each series looking for dupe issues '''
         for series in cl.keys():
-        	cl[series].sort()
-        	        
-        	temp_dict = {} 
-       		for key, group in groupby(cl[series], lambda x: x[NUMBER]):
-        		temp_dict[key] = list(group)
-			cl[series]= temp_dict
-        	        	
+                cl[series].sort()
+                        
+                temp_dict = {} 
+                for key, group in groupby(cl[series], lambda x: x[NUMBER]):
+                        temp_dict[key] = list(group)
+                        cl[series]= temp_dict
+                                
         
-        	
+                
         ''' cleaning issues without dupes '''
         remove = []
         for series in cl.keys():
-        	for number in cl[series]:
-        		if len(cl[series][number])==1:
-					remove.append((series,number))
+                for number in cl[series]:
+                        if len(cl[series][number])==1:
+                                        remove.append((series,number))
                 
         for a in remove:
-        	del cl[a[0]][a[1]]
+                del cl[a[0]][a[1]]
         
         
         ''' now a second go for series without issues after non-dupe removal '''
         remove = []
         for i in cl:
-        	if len(cl[i])==0:
-				remove.append(i)
+                if len(cl[i])==0:
+                                remove.append(i)
         for i in remove:
-        	del cl[i]
+                del cl[i]
 
         logfile.write('Found '+str(len(cl))+ ' different series with dupes\n')
         if VERBOSE:
             for series in sorted(cl.keys()):
-			    logfile.write('\t'+series+'\t('+str(cl[series].keys())+')\n')
+                            logfile.write('\t'+series+'\t('+str(cl[series].keys())+')\n')
 
-        	
+                
         ''' Now I have them sorted, I convert them to a simple list of lists (groups)...
         each item in this list is a list of dupes '''
         
         dupe_groups = []
         for i in cl:
-        	for j in cl[i]:
-        		dupe_groups.append(cl[i][j])
+                for j in cl[i]:
+                        dupe_groups.append(cl[i][j])
         
         logfile.write('Found '+str(len(dupe_groups)) +' groups of dupes, with a total of '+ str(len(reduce(list.__add__, dupe_groups)))+ ' ecomics.\n')
         if VERBOSE:
-	        for group in sorted(dupe_groups):
-        		logfile.write('\t'+group[0][SERIES]+' #'+group[0][NUMBER]+'\n')
-	        	for comic in group:
-	        		logfile.write('\t\t'+comic[FILENAME]+'\n')
+                for group in sorted(dupe_groups):
+                        logfile.write('\t'+group[0][SERIES]+' #'+group[0][NUMBER]+'\n')
+                        for comic in group:
+                                logfile.write('\t\t'+comic[FILENAME]+'\n')
 
         dupe_groups.sort()
 
@@ -230,15 +230,15 @@ def DuplicatesManager(books):
         #
         ##########################################################
         
-	#
+        #
     #      Exception handling
-	#
+        #
 
     except NoRulesFileException, ex:
         MessageBox.Show('ERROR: '+ str(ex), "Missing Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         logfile.write('ERROR: Rules file not found (dmrules.dat) in script directory\n')
         print NoRulesFileException
-	
+        
     except Exception, ex:
         logfile.write('ERROR: '+ str(Exception) +' -> '+str(ex)+'\n')
         print "The following error occured"
@@ -288,19 +288,19 @@ def LoadRules(logfile):
         rules = f.readlines()
         f.close()
         
-        logfile.write('\n\n============= Beginning rules parsing ==================================\n\n')        	
+        logfile.write('\n\n============= Beginning rules parsing ==================================\n\n')               
         logfile.write('Successfully loaded the following rules: \n\n')
         for rule in rules:
             logfile.write('\t'+rule)
         logfile.write('\n')
-        logfile.write('\n============= End of rules parsing ======================================\n\n\n\n')        	
+        logfile.write('\n============= End of rules parsing ======================================\n\n\n\n')            
         
     else:
         raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
     return rules
 
 
-	
+        
 def __cleanup_series(series_name):
     # All of the symbols below cause inconsistency in title searches
     series_name = series_name.lower()
@@ -467,4 +467,4 @@ def delcomics(comicslist):
 ####################################################
 
 class NoRulesFileException(Exception):
-	pass
+        pass
