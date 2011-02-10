@@ -484,29 +484,34 @@ def deletecomics(deletelist, logfile):
     
     for comic in deletelist:
         
-        # fullpath = Path.Combine(DUPESDIRECTORY, comic[FILENAME])
+        if MOVEFILES: 
+            fullpath = Path.Combine(DUPESDIRECTORY, comic[FILENAME])
         
-        # #Check if the file currently exists at all
-        # #print "Try and find if the file exists"
-        # if File.Exists(comic[FILEPATH]):
-        # #If the book is already in the location we don't have to do anything
-            # if fullpath == comic[FILEPATH]:
-            # #print "books path is the same"
-                # logfile.write("\n\nSkipped moving book " + comic[FILEPATH] + " because it is already located at the calculated path")
-                # CleanDirectories(DirectoryInfo(path))
-                # continue
-            # if not File.Exists(fullpath):
-                # try:
-                    # File.Move(comic[FILEPATH], fullpath)
-                    # comic[FILEPATH] = fullpath
-                # except Exception, ex:
-                        # MessageBox.Show('ERROR: '+ str(ex)+ "while trying to move "+ comic[FILENAME], MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                        # logfile.write('ERROR: '+str(ex)+'\n')
-            # else:
-                # logfile.write('ERROR: '+comic[FILENAME]+' could not be moved\n')
+           #Check if the file currently exists at all
+           
+            if File.Exists(comic[FILEPATH]):
+              #If the book is already in the location we don't have to do anything
+              if fullpath == comic[FILEPATH]:
+                print "books path is the same"
+                  logfile.write("\n\nSkipped moving book " + comic[FILEPATH] + " because it is already located at the calculated path")
+                  CleanDirectories(DirectoryInfo(path))
+                  continue
+            if not File.Exists(fullpath):
+                try:
+                    File.Move(comic[FILEPATH], fullpath)
+                    comic[FILEPATH] = fullpath
+                except Exception, ex:
+                        MessageBox.Show('ERROR: '+ str(ex)+ "while trying to move "+ comic[FILENAME], MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                        logfile.write('ERROR: '+str(ex)+'\n')
+            else:
+                logfile.write('ERROR: '+comic[FILENAME]+' could not be moved\n')
             
-        logfile.write('"DELETED"... '+ comic[FILENAME]+'\n')
+        logfile.write('"MOVED"... '+ comic[FILENAME]+'\n')
         
+        if REMOVEFROMLIB:
+            # ToDO 
+            pass
+            
     return
             
 			
