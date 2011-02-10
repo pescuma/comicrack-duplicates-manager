@@ -103,7 +103,7 @@ def DuplicatesManager(books):
     for book in books:
         
         b = BookWrapper(book)
-        comiclist.append((cleanupseries(b.Series),b.Number,b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book))
+        comiclist.append((cleanupseries(b.Series),b.Number,b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
@@ -235,8 +235,8 @@ def DuplicatesManager(books):
         #
 
     except NoRulesFileException, ex:
-        MessageBox.Show('ERROR: '+ str(ex), "Missing Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-        logfile.write('ERROR: Rules file not found (dmrules.dat) in script directory\n')
+        MessageBox.Show('ERROR: '+ str(ex), "ERROR in Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        logfile.write('ERROR: '+str(ex)+'\n')
         print NoRulesFileException
         
     except Exception, ex:
@@ -248,26 +248,48 @@ def DuplicatesManager(books):
         
     ###################### TEST ########################################
         
-    for i in range(len(dupe_groups)):
+    new_groups = []
+    for group in dupe_groups:
 
-        t_group = dupe_groups[i][:]
+        logfile.write('group\n')
+        logfile.write(str(group))
+        logfile.write('\n')
+        
+        t_group = group[:]
 
-        if len(t_group)>1:   # process group only if there is more than one comic
-           #t_group = keep_covers_most(True,t_group, logfile)          
-		   #t_group = keep_covers_most(False,t_group, logfile)          
-		   #t_group = keep_pagecount_fileless(t_group, logfile)          
-		   #t_group = keep_filesize_largest(t_group,logfile)
-		   #t_group = keep_filesize_smallest(t_group,logfile)
-		   t_group = keep_with_word('C2C', [TAGS], t_group, logfile)
-		   #t_group = remove_with_word('c2c', [FILENAME], t_group, logfile)
-		   #t_group = 
-		   #t_group = 
-		   #t_group = 
-		   #t_group = 
-		   #t_group = 
-		   #t_group = 
-        dupe_groups[i] = t_group[:]
-
+        logfile.write('t_group\n')
+        logfile.write(str(t_group))
+        logfile.write('\n')
+        
+        logfile.write('\n= PROCESSING GROUP_____\n')
+        logfile.write('= '+ t_group[0][SERIES] + ' #'+str(t_group[0][NUMBER])+'\n')
+        logfile.write('\n')
+        
+        i_rules = 0
+        
+        while (len(t_group)> 1) and (i_rules < len(rules)):
+            logfile.write("rules[i_rules][0]: ")
+            logfile.write(str(rules[i_rules][0]))
+            logfile.write("\n")
+            logfile.write("rules[i_rules][1:]: ")
+            logfile.write(str(rules[i_rules][1:]))
+            logfile.write("\n")
+            rules[i_rules].append(t_group[:])
+            rules[i_rules].append(logfile)
+            logfile.write("rules[i_rules][1:]: ")
+            logfile.write(str(rules[i_rules][1:]))
+            logfile.write("\n")
+            
+            t_group = globals()[rules[i_rules][0]](*rules[i_rules][1:])     ### this is the trick to call a function using a string with its name
+                                    
+            i_rules = i_rules+1
+        
+        new_groups.append(t_group)
+        #group = t_group[:]
+    
+    dupe_groups = new_groups[:]
+    del new_groups
+    
     #temp_groups = dupe_groups[:]
     #for group in temp_groups:
     #    if len(group) == 1: dupe_groups.remove(group)
@@ -291,65 +313,129 @@ def DuplicatesManager(books):
 
 #### ============================================================================================================================
     
+###############################
+#
+#    Read and parse rules files dmrules.dat
+#    
+    
 def LoadRules(logfile):
 
     rules = ""
+    
+    # Read file
     
     if File.Exists(RULESFILE):
         f = open(RULESFILE, 'r')
         rules = f.readlines()
         f.close()
         
+        # Delete empty lines
+        clean_rules = rules[:]
+        for line in rules:
+            if line == "\n":
+                clean_rules.remove(line)
+        rules = clean_rules[:]
+        
         logfile.write('\n\n============= Beginning rules parsing ==================================\n\n')               
-        logfile.write('Successfully loaded the following rules: \n\n')
+        logfile.write('Successfully read the following rules: \n\n')
         for rule in rules:
             logfile.write('\t'+rule)
         logfile.write('\n')
-        logfile.write('\n============= End of rules parsing ======================================\n\n\n\n')            
+            
+                  
         
     else:
         raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
-    return rules
-
-
+    
+#
+#   Parse rules
+#
+    raw_rules = rules[:]
+    strip_rules = []
+    parsed_rules = []    
+    
+    index_dict = {"filename":FILENAME, "filepath":FILEPATH, "tags":TAGS, "notes":NOTES}
+    
+    for raw_rule in raw_rules:
+        rule = raw_rule.split()
+        strip_rules.append(rule)
+                
+    for strip_rule in strip_rules:
+                
+        if len(strip_rule) != 3:
+             RaiseParseException(strip_rule)
         
-# def __cleanup_series(series_name):
-    # # All of the symbols below cause inconsistency in title searches
-    # series_name = series_name.lower()
-    # series_name = series_name.replace('.', '')
-    # series_name = series_name.replace('_', ' ')
-    # series_name = series_name.replace('-', ' ')
-    # series_name = series_name.replace("'", ' ')
-    # series_name = re.sub(r'\b(vs\.?|versus|and|or|the|an|of|a|is)\b','', series_name)
-    # series_name = re.sub(r'giantsize', r'giant size', series_name)
-    # series_name = re.sub(r'giant[- ]*sized', r'giant size', series_name)
-    # series_name = re.sub(r'kingsize', r'king size', series_name)
-    # series_name = re.sub(r'king[- ]*sized', r'king size', series_name)
-    # series_name = re.sub(r"directors", r"director's", series_name)
-    # series_name = re.sub(r"\bvolume\b", r"\bvol\b", series_name)
-    # series_name = re.sub(r"\bvol\.\b", r"\bvol\b", series_name)
-
-   # #series_name = re.sub(r'gijoe', r'gi joe', series_name)
-   
-    # series_name = re.sub(r' *', r'', series_name)
-
-   # # try to expand single number
-   # # words, and if that fails, try to contract them.
-   # # orig_series_name = series_name
-   # # if alt_b:
-      # # series_name = utils.convert_number_words(series_name, True)
-   # # if alt_b and series_name == orig_series_name:
-      # # series_name = utils.convert_number_words(series_name, False)
-      
-   # # # strip out punctuation
-   # # word = re.compile(r'[\w]{1,}')
-   # # series_name = ' '.join(word.findall(series_name))
-   
-    return series_name
-   
-
-
-
+        if strip_rule[0].lower() == "pagecount":
+            if strip_rule[1].lower() == "keep":
+                if strip_rule[2].lower() in ["fileless", "largest", "smallest", "noads", "c2c"]:
+                    parsed_rules.append(["keep_pagecount_"+strip_rule[2]])
+                    
+                else: RaiseParseException(strip_rule)               
+            elif strip_rule[1].lower() == "remove":
+                if strip_rule[2].lower() == "fileless":
+                    parsed_rules.append(["remove_pagecount_fileless"])
+                    
+                else: RaiseParseException(strip_rule)
+            else: RaiseParseException(strip_rule)
+            
+        elif strip_rule[0].lower() == "filesize":
+            if strip_rule[1].lower() == "keep":
+                if strip_rule[2].lower() == "largest":
+                    parsed_rules.append(["keep_filesize_largest"])
+                    
+                elif strip_rule[2].lower() == "smallest":
+                    parsed_rules.append(["keep_filesize_smallest"])
+                    
+                else: RaiseParseException(strip_rule)               
+            else: RaiseParseException(strip_rule)
+            
+            
+        elif strip_rule[0].lower() == "covers":
+            if strip_rule[1].lower() == "keep":
+                if strip_rule[2].lower() == "some":
+                    parsed_rules.append(["keep_covers_all","False"])
+                    
+                elif strip_rule[2].lower() == "all":
+                    parsed_rules.append(["keep_covers_all","True"])
+                    
+                else: RaiseParseException(strip_rule)               
+            else: RaiseParseException(strip_rule)
+                
+        elif strip_rule[0].lower() in ["filename", "filepath", "tags", "notes"]:
+            if strip_rule[1].lower() == "keep":
+                parsed_rules.append(["keep_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])
+                
+            elif strip_rule[1].lower() == "remove":
+                parsed_rules.append(["keep_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])  # tricky ... must be a list and a list of integers as given by global variables FILENAME, FILEPATH...
+                
+            else: RaiseParseException(strip_rule)
+        
+        elif strip_rule[0].lower() == "text":
+            if strip_rule[1].lower() == "keep":
+                parsed_rules.append(["keep_with_word",strip_rule[2],(FILENAME, FILEPATH, TAGS, NOTES)])
+                
+            elif strip_rule[1].lower() == "remove":
+                parsed_rules.append(["keep_with_word",strip_rule[2],(FILENAME, FILEPATH, TAGS, NOTES)])
+                
+            else: RaiseParseException(strip_rule)
+            
+        else:
+            RaiseParseException(strip_rule)
+            
+    if VERBOSE:
+        logfile.write('\nParsed rules:\n\n')
+        for rule in parsed_rules:
+            logfile.write('\t\t'+str(rule)+'\n')
+    logfile.write('\n============= End of rules parsing ======================================\n\n\n\n')  
+    
+    return parsed_rules
+    
+def RaiseParseException(rule):
+    wrong_rule = ""
+    for i in rule:
+        wrong_rule = wrong_rule + " " + i 
+    raise NoRulesFileException('Rule "'+ wrong_rule.upper() +'" could not be parsed')
+    return
 
 class NoRulesFileException(Exception):
         pass

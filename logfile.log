@@ -1,15 +1,32 @@
 COMICRACK DUPLICATES MANAGER V 0.1
 
-Parsing 20 ecomics
+Parsing 22 ecomics
 
 
 ============= Beginning rules parsing ==================================
 
-Successfully loaded the following rules: 
+Successfully read the following rules: 
 
-	filesize	remove	fileless
-	filename	keep	noads
-	pagecount	keep	noads
+	  filename    keep    c2c
+	  filename    remove  c2c
+	  filepath    keep    c2c
+	  filepath    remove  c2c
+	  tags        remove  c2c
+	  tags        keep    c2c
+	  notes       keep    c2c
+	  notes       remove  c2c
+	  text        keep    c2c
+	  text        remove  c2c
+	  covers      keep    all
+	  covers      keep	  some
+	  filesize    keep    largest
+	  filesize    keep    smallest
+	  pagecount   keep    largest
+	  pagecount   keep    smallest
+	  pagecount   keep    fileless
+	  pagecount   remove  fileless
+	  pagecount   keep    noads
+	  pagecount   keep    c2c
 
 ============= End of rules parsing ======================================
 
@@ -17,11 +34,11 @@ Successfully loaded the following rules:
 
 ============= Begining dupes identification ==================================
 
-Parsing 20 ecomics
-Found 5 different series
-Found 5 different series with more than one issue
-Found 5 different series with dupes
-Found 6 groups of dupes, with a total of 20 ecomics.
+Parsing 22 ecomics
+Found 6 different series
+Found 6 different series with more than one issue
+Found 6 different series with dupes
+Found 7 groups of dupes, with a total of 22 ecomics.
 
 ============= End of dupes identification=====================================
 
@@ -29,29 +46,14 @@ Found 6 groups of dupes, with a total of 20 ecomics.
 
 ============= Beginning dupes processing =====================================
 
-_________________KEEP_WITH_WORD______C2C________
-keeping...Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz
-keeping...Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz
-keeping...Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz
-keeping...Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz
-keeping...Fileless
-_________________KEEP_WITH_WORD______C2C________
-keeping...All New Batman Brave & the Bold 002 (2011) (c2c) (HFB-CPS).cbz
-keeping...All New Batman Brave & the Bold 002 (2011) (noads) (HFB-CPS).cbz
-_________________KEEP_WITH_WORD______C2C________
-keeping...The Amazing Spider-Man 651 (2011) (2 covers - noads) (RoboticProletariat-CPS-DCP).cbz
-keeping...The Amazing Spider-Man 651 (2011) (The Last Kryptonian-DCP).cbz
-keeping...The Amazing Spider-Man 651 (2011) (2 covers - c2c) (RoboticProletariat-CPS-DCP).cbz
-keeping...The Amazing Spider-Man 651 (2011) (two covers) (Minutemen-Megatonic).cbz
-_________________KEEP_WITH_WORD______C2C________
-keeping...The Amazing Spider-Man 652 (2011) (Minutemen-Megatonic).cbz
-keeping...The Amazing Spider-Man 652 (2011) (The Last Kryptonian-DCP).cbz
-_________________KEEP_WITH_WORD______C2C________
-keeping...Avengers 008 (2011) (Minutemen-TwiztidSax).cbz
-keeping...The Avengers 008 (noads) (2011) (LegionLovesJoins-CPS).cbz
-_________________KEEP_WITH_WORD______C2C________
-keeping...Avengers - The Children's Crusade 04 (of 09) (2011) (Minutemen-Meganubis).cbz
-keeping...Avengers - The Children's Crusade 04 (of 09) (2011) (c2c) (Minutemen-Meganubis).cbz
-keeping...Avengers - The Childrens Crusade 04 (2011) (c2c) (AngelicLegion-CPS).cbz
-keeping...Avengers - The Childrens Crusade 04 (2011) (f) (c2c) (AngelicLegion-CPS).cbz
-keeping...Avengers - The Childrens Crusade 04 (2011) (noads) (AngelicLegion-CPS).cbz
+group
+[('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz', 29, 18.176800727844238, <System.Guid object at 0x00000000000000E2 [8ee948e8-4c24-4f74-bed3-9bf5c4d157d8]>, None, 'D:\\_Comics\\_DCP_\\2011\\DCP.and.Minutemen.Week.of.05-01-11\\DCP\\Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x000000000000002C [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz', 22, 21.940289497375488, <System.Guid object at 0x00000000000000E3 [87c1c00e-1e65-4e83-bd68-d776dd00b939]>, None, 'D:\\_Comics\\_DCP_\\2011\\DCP.and.Minutemen.Week.of.05-01-11\\Minutemen\\Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x000000000000002E [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz', 35, 18.583944320678711, <System.Guid object at 0x00000000000000E4 [8295c881-1f66-40c8-9994-0e6ff4c977ad]>, None, 'D:\\_Comics\\_DCP_\\_c2c_\\Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000030 [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz', 23, 12.127492904663086, <System.Guid object at 0x00000000000000E5 [795df7a6-7e36-4590-b4da-d3cb25d65fc8]>, None, 'D:\\_Comics\\_DCP_\\_noads_\\Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000032 [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Fileless', 0, -9.5367431640625e-07, <System.Guid object at 0x00000000000000E6 [23a19096-bb8d-458b-a1fb-6a59e7bbe0d2]>, None, 'Fileless', '_DCP_', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000034 [cYo.Projects.ComicRack.Engine.ComicBook]>)]
+t_group
+[('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz', 29, 18.176800727844238, <System.Guid object at 0x00000000000000E7 [8ee948e8-4c24-4f74-bed3-9bf5c4d157d8]>, None, 'D:\\_Comics\\_DCP_\\2011\\DCP.and.Minutemen.Week.of.05-01-11\\DCP\\Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x000000000000002C [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz', 22, 21.940289497375488, <System.Guid object at 0x00000000000000E8 [87c1c00e-1e65-4e83-bd68-d776dd00b939]>, None, 'D:\\_Comics\\_DCP_\\2011\\DCP.and.Minutemen.Week.of.05-01-11\\Minutemen\\Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x000000000000002E [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz', 35, 18.583944320678711, <System.Guid object at 0x00000000000000E9 [8295c881-1f66-40c8-9994-0e6ff4c977ad]>, None, 'D:\\_Comics\\_DCP_\\_c2c_\\Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000030 [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz', 23, 12.127492904663086, <System.Guid object at 0x00000000000000EA [795df7a6-7e36-4590-b4da-d3cb25d65fc8]>, None, 'D:\\_Comics\\_DCP_\\_noads_\\Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000032 [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Fileless', 0, -9.5367431640625e-07, <System.Guid object at 0x00000000000000EB [23a19096-bb8d-458b-a1fb-6a59e7bbe0d2]>, None, 'Fileless', '_DCP_', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000034 [cYo.Projects.ComicRack.Engine.ComicBook]>)]
+
+= PROCESSING GROUP_____
+= adventurecomics #522
+
+rules[i_rules][0]: keep_with_word
+rules[i_rules][1:]: ['c2c', (3,)]
+rules[i_rules][1:]: ['c2c', (3,), [('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz', 29, 18.176800727844238, <System.Guid object at 0x00000000000000EC [8ee948e8-4c24-4f74-bed3-9bf5c4d157d8]>, None, 'D:\\_Comics\\_DCP_\\2011\\DCP.and.Minutemen.Week.of.05-01-11\\DCP\\Adventure Comics 522 (2011) (Avalon-SCC-DCP).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x000000000000002C [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz', 22, 21.940289497375488, <System.Guid object at 0x00000000000000ED [87c1c00e-1e65-4e83-bd68-d776dd00b939]>, None, 'D:\\_Comics\\_DCP_\\2011\\DCP.and.Minutemen.Week.of.05-01-11\\Minutemen\\Adventure Comics 522 (2011) (Minutemen-Hawaiian Punch).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x000000000000002E [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz', 35, 18.583944320678711, <System.Guid object at 0x00000000000000EE [8295c881-1f66-40c8-9994-0e6ff4c977ad]>, None, 'D:\\_Comics\\_DCP_\\_c2c_\\Adventure Comics 522 (2011) (c2c) (Legion-CPS).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000030 [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz', 23, 12.127492904663086, <System.Guid object at 0x00000000000000EF [795df7a6-7e36-4590-b4da-d3cb25d65fc8]>, None, 'D:\\_Comics\\_DCP_\\_noads_\\Adventure Comics 522 (2011) (noads) (Legion-CPS).cbz', '', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000032 [cYo.Projects.ComicRack.Engine.ComicBook]>), ('adventurecomics', '522', '', 'Fileless', 0, -9.5367431640625e-07, <System.Guid object at 0x00000000000000F0 [23a19096-bb8d-458b-a1fb-6a59e7bbe0d2]>, None, 'Fileless', '_DCP_', '', <cYo.Projects.ComicRack.Engine.ComicBook object at 0x0000000000000034 [cYo.Projects.ComicRack.Engine.ComicBook]>)]]
