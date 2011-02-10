@@ -1,11 +1,22 @@
+#####################################################################################################
+##
+##      utilsbycory.py - part of duplicatemanager, a script for comicrack
+##
+##      Author: perezmu after cbanack
+##
+##      Copyleft perezmu 2011. 
+##
+######################################################################################################
+
+#### Original declarations
 ''' 
 This module contains utility methods for working with ComicRack
 ComicBook objects (i.e. 'book' objects).
 
 @author: Cory Banack
-simplified by perezmu
-
 '''
+####
+
 
 import re
 

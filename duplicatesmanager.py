@@ -1,16 +1,15 @@
 #####################################################################################################
 ##
-##      duplicatesmanager.py
+##      duplicatesmanager.py - a script for comicrack
 ##
 ##      Author: perezmu
 ##
 ##      Copyleft perezmu 2011. 
 ##
-##      Icon -> created from http://findicons.com/icon/25565/cancel & http://findicons.com/icon/16770/copy#
+##        Detailed credits: "http://code.google.com/p/comicrack-duplicates-manager/wiki/FellowCredits"
 ##
 ######################################################################################################
 
-#### TODO: Add references to so many people
 
 
 #########
@@ -34,37 +33,12 @@ from processfunctions import *
 
 from constants import *
 
-#from process_dupes import *
-
-'''TODO: BookWrapper by XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'''
-
-# from utils import convert_bytes
 
 #
 #
 ##########
 
-##'''----------------------------------------------------------'''
-##
-############
-###
-###   DEFINITIONS
-##
-##
-##VERSION= "0.1"
-##
-##SCRIPTDIRECTORY = __file__[0:-len("duplicatesmanager.py")]
-##RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
-##LOGFILE = Path.Combine(SCRIPTDIRECTORY, "logfile.log")
-##(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,BOOK) = range(11)
-##C2C_NOADS_GAP = 5
-##
-##VERBOSE = False
-##
-###
-###
-#############
-##
+  
 ##'''---------------------------------------------------------'''
 
 
@@ -84,6 +58,14 @@ def DuplicatesManager(books):
     #
     # Starting log file
     #
+    
+    if not Directory.Exists(DUPESDIRECTORY):
+        try:
+            Directory.CreateDirectory(DUPESDIRECTORY)
+        except Exception, ex:
+                MessageBox.Show('ERROR: '+ str(ex), "ERROR creating dump directory" + DUPESDIRECTORY, MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                logfile.write('ERROR: '+str(ex)+'\n')
+                print Exception
     
     logfile = open(LOGFILE,'w')
     logfile.write('COMICRACK DUPLICATES MANAGER V '+VERSION+'\n\n')
@@ -107,6 +89,9 @@ def DuplicatesManager(books):
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
+  
+
+    
     #
     #
     ########################################
@@ -231,7 +216,7 @@ def DuplicatesManager(books):
         ##########################################################
         
         #
-    #      Exception handling
+        #      Exception handling
         #
 
     except NoRulesFileException, ex:
@@ -246,21 +231,15 @@ def DuplicatesManager(books):
         print str(ex)
         
         
-    ###################### TEST ########################################
-        
+    ###################### processing ########################################
+    
+    movedcomics = 0
+    
     new_groups = []
     for group in dupe_groups:
-
-        logfile.write('group\n')
-        logfile.write(str(group))
-        logfile.write('\n')
         
         t_group = group[:]
 
-        logfile.write('t_group\n')
-        logfile.write(str(t_group))
-        logfile.write('\n')
-        
         logfile.write('\n= PROCESSING GROUP_____\n')
         logfile.write('= '+ t_group[0][SERIES] + ' #'+str(t_group[0][NUMBER])+'\n')
         logfile.write('\n')
@@ -268,33 +247,28 @@ def DuplicatesManager(books):
         i_rules = 0
         
         while (len(t_group)> 1) and (i_rules < len(rules)):
-            logfile.write("rules[i_rules][0]: ")
-            logfile.write(str(rules[i_rules][0]))
-            logfile.write("\n")
-            logfile.write("rules[i_rules][1:]: ")
-            logfile.write(str(rules[i_rules][1:]))
-            logfile.write("\n")
-            rules[i_rules].append(t_group[:])
-            rules[i_rules].append(logfile)
-            logfile.write("rules[i_rules][1:]: ")
-            logfile.write(str(rules[i_rules][1:]))
-            logfile.write("\n")
+            t_rule = rules[i_rules][:]
             
-            t_group = globals()[rules[i_rules][0]](*rules[i_rules][1:])     ### this is the trick to call a function using a string with its name
+            t_rule.append(t_group[:])
+            t_rule.append(logfile)
+            t_rule.insert(1,ComicRack)
+            
+            t_group = globals()[t_rule[0]](*t_rule[1:])     ### this is the trick to call a function using a string with its name
                                     
             i_rules = i_rules+1
         
         new_groups.append(t_group)
-        #group = t_group[:]
+
     
     dupe_groups = new_groups[:]
-    del new_groups
     
-    #temp_groups = dupe_groups[:]
-    #for group in temp_groups:
-    #    if len(group) == 1: dupe_groups.remove(group)
-    #del temp_groups
-    #
+    remain_comics = len(reduce(list.__add__, new_groups))
+    
+    for group in dupe_groups:
+        if len(group) == 1: new_groups.remove(group)
+    
+    # new_groups holds now the remaining groups for logging purposes
+    
     #if len(dupe_groups)>=1:
     #    print 'Found ',len(dupe_groups), ' groups of dupes, with a total of ', len(reduce(list.__add__, dupe_groups)), ' comics.'
 
@@ -303,10 +277,19 @@ def DuplicatesManager(books):
     #
     ###########################################################
 
+#### End report
+
+    MessageBox.Show('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n - '+str(len(dupe_groups))+' duplicated groups processed.\n - '+str(len(new_groups))+' duplicated groups remain.\n - '+str(remain_comics)+' comics remain', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
+    logfile.write('\n\n\n\ ########################################################### n\n\n')
+    logfile.write('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n'+str(len(dupe_groups))+' duplicated groups processed.\n'+str(len(new_groups))+' duplicated groups remain..\n'+str(remain_comics)+' comics remain')
+
 #### Garbage collecting
 
     del  dupe_groups
+    del new_groups
     logfile.close()
+
+    
     
     return
 
@@ -332,7 +315,7 @@ def LoadRules(logfile):
         # Delete empty lines
         clean_rules = rules[:]
         for line in rules:
-            if line == "\n":
+            if (line == "\n") or (line[0]=="#"):
                 clean_rules.remove(line)
         rules = clean_rules[:]
         
@@ -341,9 +324,7 @@ def LoadRules(logfile):
         for rule in rules:
             logfile.write('\t'+rule)
         logfile.write('\n')
-            
-                  
-        
+                            
     else:
         raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
     
