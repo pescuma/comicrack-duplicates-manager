@@ -1,3 +1,13 @@
+#####################################################################################################
+##
+##      processfunctions.py - part of duplicatemanager, a script for comicrack
+##
+##      Author: perezmu
+##
+##      Copyleft perezmu 2011. 
+##
+######################################################################################################
+
 #########
 #
 #    Import section
@@ -38,7 +48,7 @@ from constants import *
 
 # ================ PAGECOUNT FUNCTIONS ==========================================================
 
-def keep_pagecount_noads(dgroup, logfile):
+def keep_pagecount_noads(cr, dgroup, logfile):
     ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -49,7 +59,12 @@ def keep_pagecount_noads(dgroup, logfile):
     to_remove =[]
 
     by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
-           
+   
+    for comic in by_size:
+        if comic[PAGECOUNT] == 0:
+            by_size.remove(comic)
+            logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n')
+            
     i=0                                                                             #keeps the first one
     to_keep.append(by_size[i])
     logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
@@ -62,13 +77,13 @@ def keep_pagecount_noads(dgroup, logfile):
         to_remove.append(by_size[j])
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
             
-    deletecomics(to_remove, logfile)    
+    deletecomics(cr,to_remove, logfile)    
     dgroup = to_keep[:]
     
     return dgroup
 
 
-def keep_pagecount_c2c(dgroup, logfile):
+def keep_pagecount_c2c(cr, dgroup, logfile):
     ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -93,13 +108,13 @@ def keep_pagecount_c2c(dgroup, logfile):
         to_remove.append(by_size[j])
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
             
-    if to_remove != []: deletecomics(to_remove, logfile)
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
     dgroup = to_keep[:]
     
     return dgroup
 
 
-def keep_pagecount_largest(dgroup, logfile):
+def keep_pagecount_largest(cr, dgroup, logfile):
     ''' Keeps from the 'dgroup' the ones with most pages
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -124,13 +139,13 @@ def keep_pagecount_largest(dgroup, logfile):
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
                       
     
-    if to_remove != []: deletecomics(to_remove, logfile)
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
     dgroup = to_keep[:]
     
     return dgroup
 
 
-def keep_pagecount_smallest(dgroup, logfile):
+def keep_pagecount_smallest(cr, dgroup, logfile):
     ''' Keeps from the 'group' the one with less pages
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -163,12 +178,12 @@ def keep_pagecount_smallest(dgroup, logfile):
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
                       
     
-    if to_remove != []: deletecomics(to_remove, logfile)
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
     dgroup = to_keep[:]
     return dgroup
 
     
-def keep_pagecount_fileless(dgroup, logfile):
+def keep_pagecount_fileless(cr, dgroup, logfile):
     ''' Keeps only fileless comics          
         dgroup -> list of duplicate comics
         logfile -> file object    '''
@@ -190,7 +205,7 @@ def keep_pagecount_fileless(dgroup, logfile):
             logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n') 
         for comic in to_remove:
             logfile.write('removing... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
-        if to_remove != []: deletecomics(to_remove, logfile)
+        if to_remove != []: deletecomics(cr,to_remove, logfile)
     else:
         for comic in to_remove:
             logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
@@ -202,7 +217,7 @@ def keep_pagecount_fileless(dgroup, logfile):
     return dgroup
 
     
-def remove_pagecount_fileless(dgroup, logfile):
+def remove_pagecount_fileless(cr, dgroup, logfile):
     ''' Removes fileless comics          
         dgroup -> list of duplicate comics
         logfile -> file object    '''
@@ -222,7 +237,7 @@ def remove_pagecount_fileless(dgroup, logfile):
         dgroup = to_keep[:]
         for comic in to_keep:
             logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
-        if to_remove != []: deletecomics(to_remove, logfile)
+        if to_remove != []: deletecomics(cr,to_remove, logfile)
     
     return dgroup
 
@@ -230,7 +245,7 @@ def remove_pagecount_fileless(dgroup, logfile):
     
 # =================== FILESIZE FUNCTIONS ========================================================
 
-def keep_filesize_largest(dgroup, logfile):
+def keep_filesize_largest(cr, dgroup, logfile):
     ''' Keeps from the 'group' the largest comic
             dgroup -> list of duplicate comics
             logfile -> file object    '''    
@@ -249,13 +264,13 @@ def keep_filesize_largest(dgroup, logfile):
 
     logfile.write('keeping... '+ by_size[0][FILENAME]+'(size '+ str(by_size[0][FILESIZE])+')\n')
     
-    if to_remove != []: deletecomics(to_remove, logfile)
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
     del by_size
     
     return dgroup
 
 
-def keep_filesize_smallest(dgroup, logfile):
+def keep_filesize_smallest(cr, dgroup, logfile):
     ''' Keeps from the 'group' the smallest comic
             dgroup -> list of duplicate comics
             logfile -> file object    '''  
@@ -281,7 +296,7 @@ def keep_filesize_smallest(dgroup, logfile):
 
     logfile.write('keeping... '+ by_size[0][FILENAME]+'(size '+str(by_size[0][FILESIZE])+')\n') 
     
-    if to_remove != []: deletecomics(to_remove, logfile)
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
     del by_size
     
     return dgroup    
@@ -290,7 +305,7 @@ def keep_filesize_smallest(dgroup, logfile):
     
 # =================== COVERS FUNCTIONS ============================================================    
 
-def keep_covers_all(option, dgroup, logfile):
+def keep_covers_all(cr, option, dgroup, logfile):
     ''' Keeps from the 'group' the comics with largest number of '(n covers)' in the file name
             dgroup -> list of duplicate comics
             logfile -> file object
@@ -336,7 +351,7 @@ def keep_covers_all(option, dgroup, logfile):
             dgroup.append(comic)
             logfile.write('keeping... '+ comic[FILENAME]+'\n')
     
-    if to_remove != []: deletecomics(to_remove, logfile)
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
     
     del with_covers
     del to_keep
@@ -348,7 +363,7 @@ def keep_covers_all(option, dgroup, logfile):
 
 # =================== WORD SEARCH FUNCTIONS ========================================================    
         
-def keep_with_word(word, items, dgroup, logfile):
+def keep_with_word(cr, word, items, dgroup, logfile):
     ''' Removes from the 'group' all comics that do not include 'word'
         in the fields 'item'
             dgroup -> list of duplicate comics
@@ -390,7 +405,7 @@ def keep_with_word(word, items, dgroup, logfile):
             else:
                 logfile.write('removing...'+str(comic[FILENAME])+'\n')
         
-        if to_remove != []: deletecomics(to_remove, logfile)
+        if to_remove != []: deletecomics(cr,to_remove, logfile)
                 
         dgroup = to_keep[:]
         
@@ -405,7 +420,7 @@ def keep_with_word(word, items, dgroup, logfile):
     return dgroup
 
 
-def remove_with_word(word, items, dgroup, logfile):
+def remove_with_word(cr, word, items, dgroup, logfile):
     ''' Removes from the 'group' all comics that do not include 'word'
         in the fields 'item'
             dgroup -> list of duplicate comics
@@ -450,7 +465,7 @@ def remove_with_word(word, items, dgroup, logfile):
             else:
                 logfile.write('removing...'+str(comic[item])+'\n')
   
-        if to_remove != []: deletecomics(to_remove, logfile)
+        if to_remove != []: deletecomics(cr,to_remove, logfile)
         
         dgroup = to_keep[:]
 
@@ -469,7 +484,7 @@ def remove_with_word(word, items, dgroup, logfile):
 
 # ================ DELETE COMICS FUNCTION ==========================================================
 
-def deletecomics(deletelist, logfile):
+def deletecomics(cr, deletelist, logfile):
     ''' Moves or deletes the specified comics and removes them from the library'''
     
     ''' Mostly ripped form StonePawn's Libary Organizer script'''
@@ -477,7 +492,7 @@ def deletecomics(deletelist, logfile):
     if not Directory.Exists(DUPESDIRECTORY):
         try:
             Directory.CreateDirectory(DUPESDIRECTORY)
-        except: Exception, ex:
+        except Exception, ex:
                 MessageBox.Show('ERROR: '+ str(ex), "ERROR creating dump directory" + DUPESDIRECTORY, MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 logfile.write('ERROR: '+str(ex)+'\n')
                 print Exception
@@ -489,37 +504,42 @@ def deletecomics(deletelist, logfile):
         
            #Check if the file currently exists at all
            
-            if File.Exists(comic[FILEPATH]):
+            if comic[FILENAME]!='Fileless' and File.Exists(comic[FILEPATH]):
               #If the book is already in the location we don't have to do anything
               if fullpath == comic[FILEPATH]:
-                print "books path is the same"
-                  logfile.write("\n\nSkipped moving book " + comic[FILEPATH] + " because it is already located at the calculated path")
-                  CleanDirectories(DirectoryInfo(path))
-                  continue
-            if not File.Exists(fullpath):
+                 
+                #print "books path is the same"
+                logfile.write("\n\nSkipped moving book " + comic[FILEPATH] + " because it is already located at the calculated path")
+                CleanDirectories(DirectoryInfo(path))
+                
+            if comic[FILENAME]!='Fileless' and not File.Exists(fullpath):
                 try:
                     File.Move(comic[FILEPATH], fullpath)
-                    comic[FILEPATH] = fullpath
+                    comic[BOOK].FilePath = fullpath            #update new file path
                 except Exception, ex:
-                        MessageBox.Show('ERROR: '+ str(ex)+ "while trying to move "+ comic[FILENAME], MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                        MessageBox.Show('ERROR: '+ str(ex)+ "while trying to move " + comic[FILENAME], 'MOVE ERROR', MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                         logfile.write('ERROR: '+str(ex)+'\n')
             else:
-                logfile.write('ERROR: '+comic[FILENAME]+' could not be moved\n')
-            
-        logfile.write('"MOVED"... '+ comic[FILENAME]+'\n')
+                logfile.write('WARNING: '+comic[FILENAME]+' could not be moved\n')
+             
+            logfile.write('---MOVED... '+ comic[FILENAME]+'\n')
         
         if REMOVEFROMLIB:
-            # ToDO 
-            pass
+            try:
+				cr.App.RemoveBook(comic[BOOK])
+				logfile.write('---REMOVED FROM LIBRARY... '+ comic[FILENAME]+'\n')
+            except:        
+				logfile.write('---COULD NOT REMOVE FROM LIBRARY... '+ comic[FILENAME]+'\n')
+            
             
     return
             
-			
+            
 def CleanDirectories(directory):
-	#Driectory should be a directoryinfo object
-	if not directory.Exists:
-		return
-	if len(directory.GetFiles()) == 0 and len(directory.GetDirectories()) == 0:
-		parent = directory.Parent
-		directory.Delete()
-		CleanDirectories(parent)
+    #Driectory should be a directoryinfo object
+    if not directory.Exists:
+        return
+    if len(directory.GetFiles()) == 0 and len(directory.GetDirectories()) == 0:
+        parent = directory.Parent
+        directory.Delete()
+        CleanDirectories(parent)

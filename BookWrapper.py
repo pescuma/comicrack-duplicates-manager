@@ -1,3 +1,15 @@
+#####################################################################################################
+##
+##      BookWrapper.py - part of duplicatemanager, a script for comicrack
+##
+##      Author: Pescuma Domenecci , modified by perezmu
+##
+##      Orignally from pescumas' series info panel script. 
+##
+######################################################################################################
+
+
+### original credits
 """
 Copyright (C) 2010 Ricardo Pescuma Domenecci
 
@@ -16,6 +28,7 @@ License along with this file; see the file license.txt.  If
 not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
+##########
 
 """
 Modified by apm

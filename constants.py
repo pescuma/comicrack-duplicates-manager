@@ -1,3 +1,15 @@
+#####################################################################################################
+##
+##      constants.py - part of duplicatemanager, a script for comicrack
+##
+##      Author: perezmu
+##
+##      Copyleft perezmu 2011. 
+##
+######################################################################################################
+
+
+
 ##########
 #
 #   DEFINITIONS
@@ -10,7 +22,7 @@ import System.IO
 from System.IO import Path, Directory, File, FileInfo
 
 #
-#############   **** USER CONFIGURABLE VARIABLES ***
+#############   **** USER CONFIGURABLE VARIABLES ***    ###########################################
 #
 #          see http://code.google.com/p/comicrack-duplicates-manager/wiki/UserConfiguration for details
 
@@ -18,7 +30,7 @@ from System.IO import Path, Directory, File, FileInfo
 MOVEFILES = False
 REMOVEFROMLIB = False
 
-DUPESDIRECTORY = Path.Combine("C:","__dupes__")
+DUPESDIRECTORY = Path.Combine("C:\\","__dupes__")
 
 C2C_NOADS_GAP = 5           # Difference of pages between c2c and noads
 
@@ -26,7 +38,7 @@ VERBOSE = False             # Logging level (true/false)
 
 
 #
-############   DON'T MODIFY THESE
+############   DON'T MODIFY BELOW THIS LINE ######
 #
 
 VERSION= "0.1"

@@ -1,9 +1,21 @@
+#####################################################################################################
+##
+##      getcvdb.py - part of duplicatemanager, a script for comicrack
+##
+##      Author: cbanack, for his Comic Vine Scraper module
+##
+##      
+######################################################################################################
+
+### original credits
 ''' 
 This module contains utility methods for working with ComicRack
 ComicBook objects (i.e. 'book' objects).
 
 @author: Cory Banack
 '''
+#########
+
 
 import re
 
