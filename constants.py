@@ -10,6 +10,22 @@ import System.IO
 from System.IO import Path, Directory, File, FileInfo
 
 #
+#############   **** USER CONFIGURABLE VARIABLES ***
+#
+#          see http://code.google.com/p/comicrack-duplicates-manager/wiki/UserConfiguration for details
+
+
+MOVEFILES = False
+REMOVEFROMLIB = False
+
+DUPESDIRECTORY = Path.Combine("C:","__dupes__")
+
+C2C_NOADS_GAP = 5           # Difference of pages between c2c and noads
+
+VERBOSE = False             # Logging level (true/false)
+
+
+#
 ############   DON'T MODIFY THESE
 #
 
@@ -17,21 +33,8 @@ VERSION= "0.1"
 
 SCRIPTDIRECTORY = __file__[0:-len("constants.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
-LOGFILE = Path.Combine(SCRIPTDIRECTORY, "logfile.log")
+LOGFILE = Path.Combine(DUPESDIRECTORY, "logfile.log")
 (SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,NOTES,BOOK) = range(12)
-
-#
-#############   THESE VARIABLES CAN BE DEFINED BY USER
-#
-
-MOVEFILES = False
-REMOVEFROMLIB = True
-
-DUPESDIRECTORY = Path.Combine("C:","__dupes__")
-C2C_NOADS_GAP = 5           # Difference of pages between c2c and noads
-
-VERBOSE = False             # Logging level (true/false)
-
 
 #
 #
