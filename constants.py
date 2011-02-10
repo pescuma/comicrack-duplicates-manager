@@ -24,10 +24,14 @@ LOGFILE = Path.Combine(SCRIPTDIRECTORY, "logfile.log")
 #############   THESE VARIABLES CAN BE DEFINED BY USER
 #
 
-C2C_NOADS_GAP = 5           # Difference of pages between c2c and noads
-VERBOSE = False             # Logging level (true/false)
+MOVEFILES = False
+REMOVEFROMLIB = True
 
 DUPESDIRECTORY = Path.Combine("C:","__dupes__")
+C2C_NOADS_GAP = 5           # Difference of pages between c2c and noads
+
+VERBOSE = False             # Logging level (true/false)
+
 
 #
 #
