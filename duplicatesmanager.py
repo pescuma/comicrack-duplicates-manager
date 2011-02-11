@@ -27,7 +27,7 @@ from System.Windows.Forms import DialogResult, MessageBox, MessageBoxButtons, Me
 
 
 from itertools import groupby
-from BookWrapper import *
+from dmBookWrapper import *
 from utilsbycory import cleanupseries
 from processfunctions import *
 
@@ -84,7 +84,7 @@ def DuplicatesManager(books):
     comiclist = []
     for book in books:
         
-        b = BookWrapper(book)
+        b = dmBookWrapper(book)
         comiclist.append((cleanupseries(b.Series),b.Number,b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')

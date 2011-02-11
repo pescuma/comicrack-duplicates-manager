@@ -26,16 +26,10 @@ from System.Windows.Forms import DialogResult, MessageBox, MessageBoxButtons, Me
 
 
 from itertools import groupby
-from BookWrapper import *
+from dmBookWrapper import *
 from utilsbycory import cleanupseries, convertnumberwords
 
 from constants import *
-
-#from process_dupes import *
-
-'''TODO: BookWrapper by XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'''
-
-# from utils import convert_bytes
 
 #
 #
@@ -510,7 +504,7 @@ def deletecomics(cr, deletelist, logfile):
                  
                 #print "books path is the same"
                 logfile.write("\n\nSkipped moving book " + comic[FILEPATH] + " because it is already located at the calculated path")
-                CleanDirectories(DirectoryInfo(path))
+                dmCleanDirectories(DirectoryInfo(path))
                 
             if comic[FILENAME]!='Fileless' and not File.Exists(fullpath):
                 try:
@@ -535,7 +529,7 @@ def deletecomics(cr, deletelist, logfile):
     return
             
             
-def CleanDirectories(directory):
+def dmCleanDirectories(directory):
     #Driectory should be a directoryinfo object
     if not directory.Exists:
         return
