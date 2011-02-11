@@ -236,6 +236,14 @@ def DuplicatesManager(books):
     movedcomics = 0
     
     new_groups = []
+    
+    # fix for issue 4 - if there are no dupes, end gracefully
+    if len(dupe_groups) == 0:
+        MessageBox.Show('Scritp execution completed: No duplicates found in the comics selected', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
+        logfile.write('\n\n\n\ ########################################################### n\n\n')
+        logfile.write('Scritp execution completed: No duplicates found in the comics selected')
+        return
+    
     for group in dupe_groups:
         
         t_group = group[:]
