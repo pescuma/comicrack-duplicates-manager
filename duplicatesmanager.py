@@ -85,7 +85,8 @@ def DuplicatesManager(books):
     for book in books:
         
         b = dmBookWrapper(book)
-        comiclist.append((cleanupseries(b.Series),b.Number,b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
+        # re.sub(r'^0+','',b.Number) -> removes leading 0's
+        comiclist.append((cleanupseries(b.Series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
@@ -240,8 +241,13 @@ def DuplicatesManager(books):
     # fix for issue 4 - if there are no dupes, end gracefully
     if len(dupe_groups) == 0:
         MessageBox.Show('Scritp execution completed: No duplicates found in the comics selected', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
-        logfile.write('\n\n\n\ ########################################################### n\n\n')
+        logfile.write('\n\n\n\ ########################################################### \n\n\n')
         logfile.write('Scritp execution completed: No duplicates found in the comics selected')
+        
+        del  dupe_groups
+        del new_groups
+        logfile.close()
+        
         return
     
     for group in dupe_groups:
@@ -288,7 +294,7 @@ def DuplicatesManager(books):
 #### End report
 
     MessageBox.Show('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n - '+str(len(dupe_groups))+' duplicated groups processed.\n - '+str(len(new_groups))+' duplicated groups remain.\n - '+str(remain_comics)+' comics remain', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
-    logfile.write('\n\n\n\ ########################################################### n\n\n')
+    logfile.write('\n\n\n\ ########################################################### \n\n\n')
     logfile.write('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n'+str(len(dupe_groups))+' duplicated groups processed.\n'+str(len(new_groups))+' duplicated groups remain..\n'+str(remain_comics)+' comics remain')
 
 #### Garbage collecting
@@ -411,6 +417,7 @@ def LoadRules(logfile):
         else:
             RaiseParseException(strip_rule)
             
+			
     if VERBOSE:
         logfile.write('\nParsed rules:\n\n')
         for rule in parsed_rules:
@@ -428,3 +435,4 @@ def RaiseParseException(rule):
 
 class NoRulesFileException(Exception):
         pass
+        
