@@ -41,7 +41,7 @@ VERBOSE = False             # Logging level (true/false)
 ############   DON'T MODIFY BELOW THIS LINE ######
 #
 
-VERSION= "0.1"
+VERSION= "0.2"
 
 SCRIPTDIRECTORY = __file__[0:-len("constants.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
