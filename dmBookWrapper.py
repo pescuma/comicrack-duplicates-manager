@@ -43,7 +43,7 @@ from getcvdb import extract_issue_ref
 
 
 
-class BookWrapper:
+class dmBookWrapper:
 	_emptyVals = { 
 		'Count' : '-1', 
 		'Year' : '-1', 
