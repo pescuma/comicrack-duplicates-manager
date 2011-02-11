@@ -28,6 +28,7 @@ def cleanupseries(series_name):
     series_name = series_name.replace('_', ' ')
     series_name = series_name.replace('-', ' ')
     series_name = series_name.replace("'", ' ')
+	series_name = series_name.replace(":", ' ')
     series_name = re.sub(r'\b(vs\.?|versus|and|or|the|an|of|a|is)\b','', series_name)
     series_name = re.sub(r'giantsize', r'giant size', series_name)
     series_name = re.sub(r'giant[- ]*sized', r'giant size', series_name)
