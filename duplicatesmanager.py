@@ -387,7 +387,7 @@ def LoadRules(logfile):
                 parsed_rules.append(["keep_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])
                 
             elif strip_rule[1].lower() == "remove":
-                parsed_rules.append(["keep_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])  # tricky ... must be a list and a list of integers as given by global variables FILENAME, FILEPATH...
+                parsed_rules.append(["remove_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])  # tricky ... must be a list and a list of integers as given by global variables FILENAME, FILEPATH...
                 
             else: RaiseParseException(strip_rule)
         
