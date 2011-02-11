@@ -1,10 +1,11 @@
 v0.3 -> Bug fix Release
 	
    Fixed:   - Doesn't break Series info Panel (issue 6) anymore
+
 	    - Threw and exception when there were no dupes (issue 4)
 
-   Changed:
-	    - Remove leading 0's in comic number to improve duplicate discovery
+
+   Changed: - Remove leading 0's in comic number to improve duplicate discovery
 
             - 'pagecount remove fileless' will remove all fileless dupes but one when
 		a group of only fileless is found. One with thumbnail will be kept
