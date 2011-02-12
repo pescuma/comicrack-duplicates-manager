@@ -218,75 +218,50 @@ def remove_pagecount_fileless(cr, dgroup, logfile):
     
     logfile.write('_________________REMOVE_FILELESS_ECOMICS_______________\n')
 
-    to_keep = []
-    to_remove = []
-
-    # First check if all comics are fileless...
-    for comic in dgroup:
-          
-        if comic[FILENAME] != "Fileless":
-            print 'should break!'
-            break
-        else: # check if they have custom thumb
-            print comic[BOOK].CustomThumbnailKey
-            if comic[BOOK].CustomThumbnailKey == None:
-                print 'added to_remove'
-                to_remove.append(comic)
-            else:
-                to_keep.append(comic)
-                
-    #  no one has custom thumb, choose anyone
-    if len(to_remove) == len(dgroup):
-        to_keep.append(to_remove[0])
-        to_remove.pop(0)
-          
-    #  more than one has custom thumb, keep only one
-    if len(to_keep) > 1:
-        print range(1,len(to_keep)-1)
-        for i in range(0,len(to_keep)-1):
-            to_remove.append(to_keep[i])
-            to_keep.pop(i)
-        
-    #  only one with custom thumb, now we are ok
-    if len (to_keep) == 1:
-        for comic in to_remove:
-            if comic[BOOK].CustomThumbnailKey == None:
-                logfile.write('removing... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + no cover)\n')  
-            else:
-                logfile.write('removing... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + custom cover)\n')  
-        for comic in to_keep:
-            if comic[BOOK].CustomThumbnailKey == None:
-                logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + no cover)\n')  
-            else:
-                logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + custom cover)\n')  
-        if to_remove != []: deletecomics(cr,to_remove, logfile)
-               
-        dgroup = to_keep[:]
-        return dgroup
-        
-    ###### This part above is a mess TODO: simplify removing all but one if all are fileless
-            
-            
-    # If there is a mix of ecomics and fileless, proceed as before issue 7 
     to_keep = dgroup[:]
     to_remove = []
+    fileless_thumb = []
+    fileless_nothumb = []
     
+    # First separate all fileless
     for comic in dgroup:
+          
         if comic[FILENAME] == "Fileless":
             to_keep.remove(comic)
-            to_remove.append(comic)
             if comic[BOOK].CustomThumbnailKey == None:
-                logfile.write('removing... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + no cover)\n')  
+                fileless_nothumb.append(comic)
             else:
-                logfile.write('removing... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + custom cover)\n')    
+                fileless_thumb.append(comic)
+            
+    if len(to_keep) == 0:                # all are fileless
+        if len(fileless_nothumb) == len(dgroup):  # none has custom thumb
+            to_keep.append(fileless_nothumb[0])  # keep the first one
+            fileless_nothumb.pop(0)
+            to_remove = fileless_nothumb[:]
+        elif len(fileless_thumb) == 1:    # only one with custom thumb
+            to_keep = fileless_thumb[:]
+            to_remove = fileless_nothumb[:]
+        else:                                # more than one with custom thumb
+            to_keep.append(fileless_thumb[0])    #keep the first one
+            fileless_thumb.pop(0)
+            to_remove = fileless_thumb[:]
+            to_remove.extend(fileless_nothumb)
+    
+    else:               # if there were non fileless, remove all fileless
+        to_remove.extend(fileless_thumb)
+        to_remove.extend(fileless_nothumb)
+    
+    
+    for comic in fileless_nothumb:
+        logfile.write('removing... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + no cover)\n')  
+    for comic in fileless_thumb:
+        logfile.write('removing... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless + custom cover)\n')    
+    for comic in to_keep:
+        logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
+    
+    if to_remove != []: deletecomics(cr,to_remove, logfile)
         
-    if len(to_keep) > 0:
-        dgroup = to_keep[:]
-        for comic in to_keep:
-            logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
-        if to_remove != []: deletecomics(cr,to_remove, logfile)
-        
-           
+    dgroup = to_keep[:]  
     
     return dgroup
 
