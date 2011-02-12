@@ -54,15 +54,18 @@ def keep_pagecount_noads(cr, dgroup, logfile):
 
     by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
    
-    for comic in by_size:
-        if comic[PAGECOUNT] == 0:
+    for comic in dgroup:
+        if comic[PAGECOUNT] <= 5:
             by_size.remove(comic)
-            logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n')
+            to_keep.append(comic)
+            if comic[PAGECOUNT] == 0: logfile.write('skipping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n')
+            else: logfile.write('skipping... '+ comic[FILENAME]+' #' + comic[NUMBER] +' (pages '+str(comic[PAGECOUNT])+')\n')
             
     i=0                                                                             #keeps the first one
     to_keep.append(by_size[i])
     logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
-           
+    
+       
     while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) < (int(by_size[i][PAGECOUNT]) + C2C_NOADS_GAP)):
             to_keep.append(by_size[i+1])
             logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n')
