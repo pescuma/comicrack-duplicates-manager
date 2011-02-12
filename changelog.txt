@@ -1,7 +1,7 @@
 v0.4 -> Bug fix Release
 
-   Fixed:   - Issue 7 finally solved (I hope!)
-	    - Issue 6 finally solved (I hope!)
+   Fixed:   - Issue 7 (fileless removal) finally solved (I hope!)
+	    - Issue 6 (series info panel corruption) finally solved (I hope!)
 	    - Correctly changed version number in Package.ini
 
 
