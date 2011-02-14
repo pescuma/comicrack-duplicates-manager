@@ -1,0 +1,30 @@
+# All possible rules at the end of the file
+
+# this example removes fileless and 
+# selects the noads files with largest filesize
+
+pagecount	remove	fileless
+pagecount	keep	noads
+filesize	keep	largest	
+
+
+# filename    keep    c2c
+# filename    remove  c2c
+# filepath    keep    c2c
+# filepath    remove  c2c
+# tags        remove  c2c
+# tags        keep    c2c
+# notes       keep    c2c
+# notes       remove  c2c
+# text        keep    c2c
+# text        remove  c2c
+# covers      keep    all
+# covers      keep	  some
+# filesize    keep    largest
+# filesize    keep    smallest
+# pagecount   keep    largest
+# pagecount   keep    smallest
+# pagecount   keep    fileless
+# pagecount   remove  fileless
+# pagecount   keep    noads
+# pagecount   keep    c2c

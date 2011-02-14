@@ -1,0 +1,26 @@
+v0.4 -> Bug fix Release
+
+   Fixed:   - Issue 7 (fileless removal) finally solved (I hope!)
+	    - Issue 6 (series info panel corruption) finally solved (I hope!)
+	    - Correctly changed version number in Package.ini
+
+
+v0.3 -> Bug fix Release
+	
+   Fixed:   - Doesn't break Series info Panel (issue 6) anymore
+
+	    - Threw and exception when there were no dupes (issue 4)
+
+
+   Changed: - Remove leading 0's in comic number to improve duplicate discovery
+
+            - 'pagecount remove fileless' will remove all fileless dupes but one when
+		a group of only fileless is found. One with thumbnail will be kept
+		(issue 7)
+
+
+v0.2 -> Bug fix Release
+
+	Fixed: 	- Rules '[text] remove word' is now correctly parsed.
+
+v0.1 -> Initial Release
