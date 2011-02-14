@@ -90,14 +90,22 @@ def DuplicatesManager(books):
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
-  
-
-    
+   
     #
     #
     ########################################
 
+    #########################################
+    #
+    # Setting intial options values
 
+    options = {"movefiles":MOVEFILES,
+               "removefromlib":REMOVEFROMLIB,
+               "verbose":VERBOSE,
+               "sizemargin":SIZEMARGIN,
+               "coverpages":COVERPAGES,
+               "c2c_noads_gap":C2C_NOADS_GAP}
+                   
     ########################################
     #
     # Main Loop
@@ -109,10 +117,11 @@ def DuplicatesManager(books):
         #
         # Load rules file
                 
-        rules = LoadRules(logfile)
+        rules = LoadRules(logfile, options)
 
         #
         ############################################
+
         
         
         ############################################
@@ -266,6 +275,7 @@ def DuplicatesManager(books):
             t_rule.append(t_group[:])
             t_rule.append(logfile)
             t_rule.insert(1,ComicRack)
+            t_rule.insert(1,options)
             
             t_group = globals()[t_rule[0]](*t_rule[1:])     ### this is the trick to call a function using a string with its name
                                     
@@ -315,12 +325,20 @@ def DuplicatesManager(books):
 #    Read and parse rules files dmrules.dat
 #    
     
-def LoadRules(logfile):
+def LoadRules(logfile, options):
 
-    rules = ""
+    rules = []
+    options_list = []   
     
+      
+    index_dict = {"filename":FILENAME, "filepath":FILEPATH, "tags":TAGS, "notes":NOTES}
+
+    
+    bool_options = ("movefiles","removefromlib","verbose")
+    int_options = ("sizemargin", "coverspages", "c2c_noads_gap")
+    
+
     # Read file
-    
     if File.Exists(RULESFILE):
         f = open(RULESFILE, 'r')
         rules = f.readlines()
@@ -331,9 +349,18 @@ def LoadRules(logfile):
         for line in rules:
             if (line == "\n") or (line[0]=="#"):
                 clean_rules.remove(line)
+            elif (line[0]=="@"):
+                options_list.append(line[1:].lower())
+                clean_rules.remove(line)
         rules = clean_rules[:]
         
-        logfile.write('\n\n============= Beginning rules parsing ==================================\n\n')               
+        logfile.write('\n\n============= Beginning options reading ==================================\n\n')               
+        logfile.write('Successfully read the following options: \n\n')
+        for option in options_list:
+            logfile.write('\t'+option)
+        logfile.write('\n')
+                
+        logfile.write('\n\n============= Beginning rules reading ==================================\n\n')               
         logfile.write('Successfully read the following rules: \n\n')
         for rule in rules:
             logfile.write('\t'+rule)
@@ -343,13 +370,54 @@ def LoadRules(logfile):
         raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
     
 #
+#   Parse options
+#
+#               Checks if options need to have (and in fact do have) boolean or integer values
+
+    bDict = {"false":False, "true":True}
+    
+ 
+    
+    for option in (options_list):
+        
+        opName = option.strip().split()[0]
+        opVal = option.strip().split()[1]
+
+                                            # boolean option
+        if opName in bool_options:
+            if opVal in bDict.keys():
+                options[opName] = bDict[opVal]
+            else:
+                raise NoRulesFileException('Option "'+ option.upper() +'" value is invalid ("True" or "False" required)')
+                
+                                            # integer option
+        elif opName in int_options:
+            try:
+                options[opName] = int(opVal.strip())
+            except:
+                raise NoRulesFileException('Option "'+ option.upper() +'" value is invalid (integer required)')             
+                                            # failure
+        else:
+            raise NoRulesFileException('Option "'+ option.upper() +'" not recognized (' + str(opName) + ')')
+   
+
+    logfile.write('\n\n============= Beginning options parsing ==================================\n\n')               
+    logfile.write('Using the following options: \n\n')
+    for option in options:
+        logfile.write('\t'+option.upper() + " = " + str(options[option]).upper()+'\n')
+        
+#
 #   Parse rules
 #
+
+    logfile.write('\n\n============= Beginning rules parsing ==================================\n\n')               
+     
+
+    index_dict = {"filename":FILENAME, "filepath":FILEPATH, "tags":TAGS, "notes":NOTES}
+    
     raw_rules = rules[:]
     strip_rules = []
     parsed_rules = []    
-    
-    index_dict = {"filename":FILENAME, "filepath":FILEPATH, "tags":TAGS, "notes":NOTES}
     
     for raw_rule in raw_rules:
         rule = raw_rule.split()
@@ -357,8 +425,11 @@ def LoadRules(logfile):
                 
     for strip_rule in strip_rules:
                 
-        if len(strip_rule) != 3:
-             RaiseParseException(strip_rule)
+        if len(strip_rule) < 3:
+            RaiseParseException(strip_rule)        # invalid rule
+        elif len(strip_rule) > 3:                  # everything beyond the 3rd position is a text string
+            strip_rule[2] = " ".join(strip_rule[2:])
+            del strip_rule[3:]
         
         if strip_rule[0].lower() == "pagecount":
             if strip_rule[1].lower() == "keep":

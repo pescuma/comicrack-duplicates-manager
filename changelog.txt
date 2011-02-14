@@ -1,11 +1,18 @@
-v0.5 -> Bug fix Release
+v0.5 -> 
 
-   Fixed:   - Issue 12 : cleaning empty dirs should work now.
+   Fixed:   - Major bug found in the 'text' rules!!!!!
+
+   Changed: - 'pagecount keep noads' now skips comics with COVERPAGES or less pages
+	    - Added "@ OPTION VALUE" to the rules.dat file
+	    - Added new options:
+		    - COVERPAGES (int)
+		    - SIZEMARGIN (int)     (part of issue 9, still not operative)
+            - Allow more than one word as part of the text based rules (issue 8)	
 
 v0.4 -> Bug fix Release
 
-   Fixed:   - Issue 7 (fileless removal) finally solved (I hope!)
-	    - Issue 6 (series info panel corruption) finally solved (I hope!)
+   Fixed:   - Issue 7 finally solved (I hope!)
+	    - Issue 6 finally solved (I hope!)
 	    - Correctly changed version number in Package.ini
 
 

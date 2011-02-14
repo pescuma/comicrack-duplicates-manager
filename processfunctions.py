@@ -42,7 +42,7 @@ from constants import *
 
 # ================ PAGECOUNT FUNCTIONS ==========================================================
 
-def keep_pagecount_noads(cr, dgroup, logfile):
+def keep_pagecount_noads(options, cr, dgroup, logfile):
     ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -55,7 +55,7 @@ def keep_pagecount_noads(cr, dgroup, logfile):
     by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
    
     for comic in dgroup:
-        if comic[PAGECOUNT] <= 5:
+        if comic[PAGECOUNT] <= options["coverpages"]:
             by_size.remove(comic)
             to_keep.append(comic)
             if comic[PAGECOUNT] == 0: logfile.write('skipping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n')
@@ -74,13 +74,13 @@ def keep_pagecount_noads(cr, dgroup, logfile):
         to_remove.append(by_size[j])
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
             
-    deletecomics(cr,to_remove, logfile)    
+    deletecomics(options, cr,to_remove, logfile)    
     dgroup = to_keep[:]
     
     return dgroup
 
 
-def keep_pagecount_c2c(cr, dgroup, logfile):
+def keep_pagecount_c2c(options, cr, dgroup, logfile):
     ''' Keeps from the 'group' the ones that seem to be 'noads' (less pages)
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -97,7 +97,7 @@ def keep_pagecount_c2c(cr, dgroup, logfile):
     logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
          
  
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) > (int(by_size[i][PAGECOUNT]) - int(C2C_NOADS_GAP))):
+    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) > (int(by_size[i][PAGECOUNT]) - int(options["c2c_noads_gap"]))):
             to_keep.append(by_size[i+1])
             logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
             i = i+1
@@ -105,13 +105,13 @@ def keep_pagecount_c2c(cr, dgroup, logfile):
         to_remove.append(by_size[j])
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
             
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     dgroup = to_keep[:]
     
     return dgroup
 
 
-def keep_pagecount_largest(cr, dgroup, logfile):
+def keep_pagecount_largest(options, cr, dgroup, logfile):
     ''' Keeps from the 'dgroup' the ones with most pages
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -136,13 +136,13 @@ def keep_pagecount_largest(cr, dgroup, logfile):
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
                       
     
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     dgroup = to_keep[:]
     
     return dgroup
 
 
-def keep_pagecount_smallest(cr, dgroup, logfile):
+def keep_pagecount_smallest(options, cr, dgroup, logfile):
     ''' Keeps from the 'group' the one with less pages
             dgroup -> list of duplicate comics
             logfile -> file object    '''
@@ -175,12 +175,12 @@ def keep_pagecount_smallest(cr, dgroup, logfile):
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
                       
     
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     dgroup = to_keep[:]
     return dgroup
 
     
-def keep_pagecount_fileless(cr, dgroup, logfile):
+def keep_pagecount_fileless(options, cr, dgroup, logfile):
     ''' Keeps only fileless comics          
         dgroup -> list of duplicate comics
         logfile -> file object    '''
@@ -202,7 +202,7 @@ def keep_pagecount_fileless(cr, dgroup, logfile):
             logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n') 
         for comic in to_remove:
             logfile.write('removing... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
-        if to_remove != []: deletecomics(cr,to_remove, logfile)
+        if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     else:
         for comic in to_remove:
             logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
@@ -214,7 +214,7 @@ def keep_pagecount_fileless(cr, dgroup, logfile):
     return dgroup
 
     
-def remove_pagecount_fileless(cr, dgroup, logfile):
+def remove_pagecount_fileless(options, cr, dgroup, logfile):
     ''' Removes fileless comics          
         dgroup -> list of duplicate comics
         logfile -> file object    '''
@@ -262,7 +262,7 @@ def remove_pagecount_fileless(cr, dgroup, logfile):
     for comic in to_keep:
         logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
     
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
         
     dgroup = to_keep[:]  
     
@@ -271,7 +271,7 @@ def remove_pagecount_fileless(cr, dgroup, logfile):
     
 # =================== FILESIZE FUNCTIONS ========================================================
 
-def keep_filesize_largest(cr, dgroup, logfile):
+def keep_filesize_largest(options, cr, dgroup, logfile):
     ''' Keeps from the 'group' the largest comic
             dgroup -> list of duplicate comics
             logfile -> file object    '''    
@@ -290,13 +290,13 @@ def keep_filesize_largest(cr, dgroup, logfile):
 
     logfile.write('keeping... '+ by_size[0][FILENAME]+'(size '+ str(by_size[0][FILESIZE])+')\n')
     
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     del by_size
     
     return dgroup
 
 
-def keep_filesize_smallest(cr, dgroup, logfile):
+def keep_filesize_smallest(options, cr, dgroup, logfile):
     ''' Keeps from the 'group' the smallest comic
             dgroup -> list of duplicate comics
             logfile -> file object    '''  
@@ -322,7 +322,7 @@ def keep_filesize_smallest(cr, dgroup, logfile):
 
     logfile.write('keeping... '+ by_size[0][FILENAME]+'(size '+str(by_size[0][FILESIZE])+')\n') 
     
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     del by_size
     
     return dgroup    
@@ -331,7 +331,7 @@ def keep_filesize_smallest(cr, dgroup, logfile):
     
 # =================== COVERS FUNCTIONS ============================================================    
 
-def keep_covers_all(cr, option, dgroup, logfile):
+def keep_covers_all(options, cr, option, dgroup, logfile):
     ''' Keeps from the 'group' the comics with largest number of '(n covers)' in the file name
             dgroup -> list of duplicate comics
             logfile -> file object
@@ -377,7 +377,7 @@ def keep_covers_all(cr, option, dgroup, logfile):
             dgroup.append(comic)
             logfile.write('keeping... '+ comic[FILENAME]+'\n')
     
-    if to_remove != []: deletecomics(cr,to_remove, logfile)
+    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
     
     del with_covers
     del to_keep
@@ -389,7 +389,7 @@ def keep_covers_all(cr, option, dgroup, logfile):
 
 # =================== WORD SEARCH FUNCTIONS ========================================================    
         
-def keep_with_word(cr, word, items, dgroup, logfile):
+def keep_with_word(options, cr, word, items, dgroup, logfile):
     ''' Removes from the 'group' all comics that do not include 'word'
         in the fields 'item'
             dgroup -> list of duplicate comics
@@ -407,6 +407,8 @@ def keep_with_word(cr, word, items, dgroup, logfile):
     if word in ('noads') : wordlist = ('noads', 'no ads')
     if word in ('(f)', 'fixed'): wordlist = ('(f)', 'fixed')
     if word in ('(f)', 'fiche'): wordlist = ('(f)', 'fiche')
+    if word in ('zip','cbz'): wordlist = ('zip','cbz')
+    if word in ('rar','cbr'): wordlist = ('rar','cbr')
 
     to_keep = []
     to_remove = []
@@ -415,14 +417,14 @@ def keep_with_word(cr, word, items, dgroup, logfile):
         searchstring = ""
         for item in items:
             searchstring = searchstring + " " + cleanupseries(comic[item])
-        ''' adds all search files together '''
+            ''' adds all search strings together '''
         
         for word in wordlist:
             if searchstring.find(word) != -1:    #word found
                 if comic not in to_keep: to_keep.append(comic)
                 break
-            else:
-                if comic not in to_remove: to_remove.append(comic)
+        if comic not in to_keep: to_remove.append(comic)
+                
                 
     if len(to_keep)>=1:     # Make sure at least 1 book remains!!!!
         for comic in dgroup:
@@ -431,7 +433,10 @@ def keep_with_word(cr, word, items, dgroup, logfile):
             else:
                 logfile.write('removing...'+str(comic[FILENAME])+'\n')
         
-        if to_remove != []: deletecomics(cr,to_remove, logfile)
+        print to_keep
+        print to_remove
+        
+        if to_remove != []: deletecomics(options, cr, to_remove, logfile)
                 
         dgroup = to_keep[:]
         
@@ -446,7 +451,7 @@ def keep_with_word(cr, word, items, dgroup, logfile):
     return dgroup
 
 
-def remove_with_word(cr, word, items, dgroup, logfile):
+def remove_with_word(options, cr, word, items, dgroup, logfile):
     ''' Removes from the 'group' all comics that do not include 'word'
         in the fields 'item'
             dgroup -> list of duplicate comics
@@ -491,7 +496,7 @@ def remove_with_word(cr, word, items, dgroup, logfile):
             else:
                 logfile.write('removing...'+str(comic[item])+'\n')
   
-        if to_remove != []: deletecomics(cr,to_remove, logfile)
+        if to_remove != []: deletecomics(options, cr,to_remove, logfile)
         
         dgroup = to_keep[:]
 
@@ -510,10 +515,10 @@ def remove_with_word(cr, word, items, dgroup, logfile):
 
 # ================ DELETE COMICS FUNCTION ==========================================================
 
-def deletecomics(cr, deletelist, logfile):
+def deletecomics(options, cr, deletelist, logfile):
     ''' Moves or deletes the specified comics and removes them from the library'''
     
-    ''' Mostly ripped form Stonepaw's Libary Organizer script'''
+    ''' Mostly ripped form StonePawn's Libary Organizer script'''
     
     if not Directory.Exists(DUPESDIRECTORY):
         try:
@@ -525,7 +530,7 @@ def deletecomics(cr, deletelist, logfile):
     
     for comic in deletelist:
         
-        if MOVEFILES: 
+        if options["movefiles"]: 
             fullpath = Path.Combine(DUPESDIRECTORY, comic[FILENAME])
         
            #Check if the file currently exists at all
@@ -550,7 +555,7 @@ def deletecomics(cr, deletelist, logfile):
              
             logfile.write('---MOVED... '+ comic[FILENAME]+'\n')
         
-        if REMOVEFROMLIB:
+        if options["removefromlib"]:
             try:
                 cr.App.RemoveBook(comic[BOOK])
                 logfile.write('---REMOVED FROM LIBRARY... '+ comic[FILENAME]+'\n')
@@ -568,4 +573,4 @@ def dmCleanDirectories(directory):
     if len(directory.GetFiles()) == 0 and len(directory.GetDirectories()) == 0:
         parent = directory.Parent
         directory.Delete()
-        dmCleanDirectories(parent)
+        CleanDirectories(parent)

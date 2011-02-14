@@ -25,6 +25,9 @@ from System.IO import Path, Directory, File, FileInfo
 #############   **** USER CONFIGURABLE VARIABLES ***    ###########################################
 #
 #          see http://code.google.com/p/comicrack-duplicates-manager/wiki/UserConfiguration for details
+#
+#          These may also be set in the "dmrules.dat" rules file using this syntax:  "@ OPTION VALUE". Values
+#           found in the "dmrules.dat" file override the defaults set in this file.
 
 
 MOVEFILES = False
@@ -32,9 +35,11 @@ REMOVEFROMLIB = False
 
 DUPESDIRECTORY = Path.Combine("C:\\","__dupes__")
 
-C2C_NOADS_GAP = 5           # Difference of pages between c2c and noads
-
-VERBOSE = False             # Logging level (true/false)
+C2C_NOADS_GAP = 5          # Difference of pages between c2c and noads
+SIZEMARGIN = 0             # Preserve comics within sizemargin % size
+COVERPAGES = 4             # Minimal number of pages to be considered "covers only"
+ 
+VERBOSE = False            # Logging level (true/false)
 
 
 #

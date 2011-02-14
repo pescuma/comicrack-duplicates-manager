@@ -3,11 +3,20 @@
 # this example removes fileless and 
 # selects the noads files with largest filesize
 
+@ MOVEFILES True
+@ REMOVEFROMLIB True
+@ C2C_NOADS_GAP      120
+
 pagecount	remove	fileless
+covers      keep    some
+filename   keep    edit 
+filename   remove  cover only
+filename    keep    noads
 pagecount	keep	noads
+text keep Bchry
 filesize	keep	largest	
-
-
+#
+#
 # filename    keep    c2c
 # filename    remove  c2c
 # filepath    keep    c2c
