@@ -1,3 +1,7 @@
+v0.5 -> Bug fix Release
+
+   Fixed:   - Issue 12 : cleaning empty dirs should work now.
+
 v0.4 -> Bug fix Release
 
    Fixed:   - Issue 7 (fileless removal) finally solved (I hope!)
