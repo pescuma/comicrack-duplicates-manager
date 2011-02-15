@@ -30,6 +30,7 @@ from itertools import groupby
 from dmBookWrapper import *
 from utilsbycory import cleanupseries
 from processfunctions import *
+from dmParser import *
 
 from constants import *
 
@@ -208,7 +209,7 @@ def DuplicatesManager(books):
                 for j in cl[i]:
                         dupe_groups.append(cl[i][j])
         
-        logfile.write('Found '+str(len(dupe_groups)) +' groups of dupes, with a total of '+ str(len(reduce(list.__add__, dupe_groups)))+ ' ecomics.\n')
+        logfile.write('Found '+str(len(dupe_groups)) +' groups of dupes, with a total of '+ str(len(reduce(list.__add__, dupe_groups, [])))+ ' ecomics.\n')
         if VERBOSE:
                 for group in sorted(dupe_groups):
                         logfile.write('\t'+group[0][SERIES]+' #'+group[0][NUMBER]+'\n')
@@ -233,12 +234,14 @@ def DuplicatesManager(books):
         MessageBox.Show('ERROR: '+ str(ex), "ERROR in Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         logfile.write('ERROR: '+str(ex)+'\n')
         print NoRulesFileException
+        return
         
     except Exception, ex:
         logfile.write('ERROR: '+ str(Exception) +' -> '+str(ex)+'\n')
         print "The following error occured"
         print Exception
         print str(ex)
+        return
         
         
     ###################### processing ########################################
@@ -326,48 +329,44 @@ def DuplicatesManager(books):
 #    
     
 def LoadRules(logfile, options):
+    
+    VERBOSE = True
+    
+    # Check if file exists
+    if not File.Exists(RULESFILE):
+        raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
+    
+    # Read file
+    f = open(RULESFILE, 'r')
+    all_lines = f.readlines()
+    f.close()
 
+    # Parse rules and filter out options
+    options_list = []
     rules = []
-    options_list = []   
+    for line in Parse(all_lines):
+        first_word = line[2] 
+        if first_word[0] == '@':
+            line[2] = first_word[1:]
+            options_list.append(line)
+        else:
+            rules.append(line)
     
+    logfile.write('\n\n============= Beginning options reading ==================================\n\n')               
+    logfile.write('Successfully read the following options: \n\n')
+    for option in options_list:
+        logfile.write('\tLine ' + str(option[0]) + ': ' + str(option[2:]))
+    logfile.write('\n')
+            
+    logfile.write('\n\n============= Beginning rules reading ==================================\n\n')               
+    logfile.write('Successfully read the following rules: \n\n')
+    for rule in rules:
+        logfile.write('\tLine ' + str(rule[0]) + ': ' + str(rule[2:]))
+    logfile.write('\n')
       
-    index_dict = {"filename":FILENAME, "filepath":FILEPATH, "tags":TAGS, "notes":NOTES}
-
-    
     bool_options = ("movefiles","removefromlib","verbose")
     int_options = ("sizemargin", "coverspages", "c2c_noads_gap")
-    
 
-    # Read file
-    if File.Exists(RULESFILE):
-        f = open(RULESFILE, 'r')
-        rules = f.readlines()
-        f.close()
-        
-        # Delete empty lines
-        clean_rules = rules[:]
-        for line in rules:
-            if (line == "\n") or (line[0]=="#"):
-                clean_rules.remove(line)
-            elif (line[0]=="@"):
-                options_list.append(line[1:].lower())
-                clean_rules.remove(line)
-        rules = clean_rules[:]
-        
-        logfile.write('\n\n============= Beginning options reading ==================================\n\n')               
-        logfile.write('Successfully read the following options: \n\n')
-        for option in options_list:
-            logfile.write('\t'+option)
-        logfile.write('\n')
-                
-        logfile.write('\n\n============= Beginning rules reading ==================================\n\n')               
-        logfile.write('Successfully read the following rules: \n\n')
-        for rule in rules:
-            logfile.write('\t'+rule)
-        logfile.write('\n')
-                            
-    else:
-        raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
     
 #
 #   Parse options
@@ -375,30 +374,34 @@ def LoadRules(logfile, options):
 #               Checks if options need to have (and in fact do have) boolean or integer values
 
     bDict = {"false":False, "true":True}
-    
- 
-    
-    for option in (options_list):
+     
+    for option in options_list:
+        opLineNum = option[0]
+        opLine = option[1]
         
-        opName = option.strip().split()[0]
-        opVal = option.strip().split()[1]
+        if len(option) != 4:
+            raise NoRulesFileException('Line ' + str(opLineNum) + ': Option "' + opLine + '" has wrong format')
+            
+        opName = option[2].lower()
+        opVal = option[3].lower()
 
                                             # boolean option
         if opName in bool_options:
+            opVal = opVal
             if opVal in bDict.keys():
                 options[opName] = bDict[opVal]
             else:
-                raise NoRulesFileException('Option "'+ option.upper() +'" value is invalid ("True" or "False" required)')
+                raise NoRulesFileException('Line ' + str(opLineNum) + ': Option "'+ opLine +'" value is invalid ("True" or "False" required)')
                 
                                             # integer option
         elif opName in int_options:
             try:
-                options[opName] = int(opVal.strip())
+                options[opName] = int(opVal)
             except:
-                raise NoRulesFileException('Option "'+ option.upper() +'" value is invalid (integer required)')             
+                raise NoRulesFileException('Line ' + str(opLineNum) + ': Option "'+ opLine +'" value is invalid (integer required)')             
                                             # failure
         else:
-            raise NoRulesFileException('Option "'+ option.upper() +'" not recognized (' + str(opName) + ')')
+            raise NoRulesFileException('Line ' + str(opLineNum) + ': Option "'+ opLine +'" not recognized (' + str(opName) + ')')
    
 
     logfile.write('\n\n============= Beginning options parsing ==================================\n\n')               
@@ -411,99 +414,97 @@ def LoadRules(logfile, options):
 #
 
     logfile.write('\n\n============= Beginning rules parsing ==================================\n\n')               
-     
-
-    index_dict = {"filename":FILENAME, "filepath":FILEPATH, "tags":TAGS, "notes":NOTES}
     
-    raw_rules = rules[:]
-    strip_rules = []
-    parsed_rules = []    
-    
-    for raw_rule in raw_rules:
-        rule = raw_rule.split()
-        strip_rules.append(rule)
-                
-    for strip_rule in strip_rules:
-                
-        if len(strip_rule) < 3:
-            RaiseParseException(strip_rule)        # invalid rule
-        elif len(strip_rule) > 3:                  # everything beyond the 3rd position is a text string
-            strip_rule[2] = " ".join(strip_rule[2:])
-            del strip_rule[3:]
+    parsed_rules = []
         
-        if strip_rule[0].lower() == "pagecount":
-            if strip_rule[1].lower() == "keep":
-                if strip_rule[2].lower() in ["fileless", "largest", "smallest", "noads", "c2c"]:
-                    parsed_rules.append(["keep_pagecount_"+strip_rule[2]])
-                    
-                else: RaiseParseException(strip_rule)               
-            elif strip_rule[1].lower() == "remove":
-                if strip_rule[2].lower() == "fileless":
-                    parsed_rules.append(["remove_pagecount_fileless"])
-                    
-                else: RaiseParseException(strip_rule)
-            else: RaiseParseException(strip_rule)
-            
-        elif strip_rule[0].lower() == "filesize":
-            if strip_rule[1].lower() == "keep":
-                if strip_rule[2].lower() == "largest":
-                    parsed_rules.append(["keep_filesize_largest"])
-                    
-                elif strip_rule[2].lower() == "smallest":
-                    parsed_rules.append(["keep_filesize_smallest"])
-                    
-                else: RaiseParseException(strip_rule)               
-            else: RaiseParseException(strip_rule)
-            
-            
-        elif strip_rule[0].lower() == "covers":
-            if strip_rule[1].lower() == "keep":
-                if strip_rule[2].lower() == "some":
-                    parsed_rules.append(["keep_covers_all","False"])
-                    
-                elif strip_rule[2].lower() == "all":
-                    parsed_rules.append(["keep_covers_all","True"])
-                    
-                else: RaiseParseException(strip_rule)               
-            else: RaiseParseException(strip_rule)
-                
-        elif strip_rule[0].lower() in ["filename", "filepath", "tags", "notes"]:
-            if strip_rule[1].lower() == "keep":
-                parsed_rules.append(["keep_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])
-                
-            elif strip_rule[1].lower() == "remove":
-                parsed_rules.append(["remove_with_word",strip_rule[2],(index_dict[strip_rule[0]],)])  # tricky ... must be a list and a list of integers as given by global variables FILENAME, FILEPATH...
-                
-            else: RaiseParseException(strip_rule)
-        
-        elif strip_rule[0].lower() == "text":
-            if strip_rule[1].lower() == "keep":
-                parsed_rules.append(["keep_with_word",strip_rule[2],(FILENAME, FILEPATH, TAGS, NOTES)])
-                
-            elif strip_rule[1].lower() == "remove":
-                parsed_rules.append(["keep_with_word",strip_rule[2],(FILENAME, FILEPATH, TAGS, NOTES)])
-                
-            else: RaiseParseException(strip_rule)
-            
-        else:
-            RaiseParseException(strip_rule)
-            
+    for rule in rules:
+        parsed_rules.append(ParseRule(rule))            
 			
     if VERBOSE:
         logfile.write('\nParsed rules:\n\n')
         for rule in parsed_rules:
             logfile.write('\t\t'+str(rule)+'\n')
     logfile.write('\n============= End of rules parsing ======================================\n\n\n\n')  
-    
+
     return parsed_rules
+
     
-def RaiseParseException(rule):
-    wrong_rule = ""
-    for i in rule:
-        wrong_rule = wrong_rule + " " + i 
-    raise NoRulesFileException('Rule "'+ wrong_rule.upper() +'" could not be parsed')
-    return
+
+def AsPercentage(args, index, defVal):
+    if index < len(args):
+        text = args[index]
+    else:
+        text = defVal
+    
+    if text[-1] == '%':
+        num = text[:-1]
+    else:
+        num = text 
+    
+    try:
+        return int(num)
+    except:
+        raise Exception('Invalid percentage value: ' + text)
+    
+
+
+known_rules = [
+    [ ["pagecount", "keep", "fileless"],  lambda args: ["keep_pagecount_fileless"] ],
+    [ ["pagecount", "keep", "largest"],   lambda args: ["keep_pagecount_largest"] ],
+    [ ["pagecount", "keep", "smallest"],  lambda args: ["keep_pagecount_smallest"] ],
+    [ ["pagecount", "keep", "noads"],     lambda args: ["keep_pagecount_noads"] ],
+    [ ["pagecount", "keep", "c2c"],       lambda args: ["keep_pagecount_c2c"] ],
+    [ ["pagecount", "remove", "fileless"],lambda args: ["remove_pagecount_fileless"] ],
+    [ ["filesize", "keep", "largest"],    lambda args: ["keep_filesize_largest", AsPercentage(args, 0, "0%")] ],
+    [ ["filesize", "keep", "smallest"],   lambda args: ["keep_filesize_smallest"] ],
+    [ ["covers", "keep", "some"],         lambda args: ["keep_covers_all", "False"] ],
+    [ ["covers", "keep", "all"],          lambda args: ["keep_covers_all", "True"] ],
+    [ ["filename", "keep"],               lambda args: ["keep_with_word", args[0], (FILENAME)] ],
+    [ ["filepath", "keep"],               lambda args: ["keep_with_word", args[0], (FILEPATH)] ],
+    [ ["tags", "keep"],                   lambda args: ["keep_with_word", args[0], (TAGS)] ],
+    [ ["notes", "keep"],                  lambda args: ["keep_with_word", args[0], (NOTES)] ],
+    [ ["filename", "remove"],             lambda args: ["remove_with_word", args[0], (FILENAME)] ],
+    [ ["filepath", "remove"],             lambda args: ["remove_with_word", args[0], (FILEPATH)] ],
+    [ ["tags", "remove"],                 lambda args: ["remove_with_word", args[0], (TAGS)] ],
+    [ ["notes", "remove"],                lambda args: ["remove_with_word", args[0], (NOTES)] ],
+    [ ["text", "keep"],                   lambda args: ["keep_with_word", args[0], (FILENAME, FILEPATH, TAGS, NOTES)] ],
+    [ ["text", "remove"],                 lambda args: ["remove_with_word", args[0], (FILENAME, FILEPATH, TAGS, NOTES)] ],
+]
+
+
+def ParseRule(rule):
+    print(rule)
+    
+    line_num = rule[0]
+    line = rule[1]
+    rule_tokens = rule[2:]
+    
+    # Try to match to a known command
+    for cmd in known_rules:
+        tokens = cmd[0]
+        action = cmd[1]
+        
+        if len(rule_tokens) < len(tokens):
+            continue
+        
+        # Check it the rule matches the command
+        matches = True
+        for i in range(len(tokens)):
+            if tokens[i] != rule_tokens[i]:
+                matches = False
+                break;
+        
+        if not matches:
+            continue
+        
+        args = rule_tokens[len(tokens):]
+        return action(args)
+    
+    # If got here not command was matched
+    raise NoRulesFileException('Line ' + str(line_num) + ': Rule could not be parsed:\n' + line) 
+
+
 
 class NoRulesFileException(Exception):
-        pass
-        
+    pass
+    
