@@ -271,7 +271,7 @@ def remove_pagecount_fileless(options, cr, dgroup, logfile):
     
 # =================== FILESIZE FUNCTIONS ========================================================
 
-def keep_filesize_largest(options, cr, dgroup, logfile):
+def keep_filesize_largest(options, cr, percentage, dgroup, logfile):
     ''' Keeps from the 'group' the largest comic
             dgroup -> list of duplicate comics
             logfile -> file object    '''    
