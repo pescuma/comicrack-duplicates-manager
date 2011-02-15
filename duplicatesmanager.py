@@ -330,8 +330,6 @@ def DuplicatesManager(books):
     
 def LoadRules(logfile, options):
     
-    VERBOSE = True
-    
     # Check if file exists
     if not File.Exists(RULESFILE):
         raise NoRulesFileException('Rules File (dmrules.dat) could not be found in the script directory ('+ SCRIPTDIRECTORY +')')
@@ -345,17 +343,17 @@ def LoadRules(logfile, options):
     options_list = []
     rules = []
     for line in Parse(all_lines):
-        first_word = line[2] 
-        if first_word[0] == '@':
-            line[2] = first_word[1:]
+        if line[2] == '@':
             options_list.append(line)
+        elif line[2][0] == '@':
+            options_list.append(line[:2] + ['@', line[2][1:]] + line[3:])
         else:
             rules.append(line)
     
     logfile.write('\n\n============= Beginning options reading ==================================\n\n')               
     logfile.write('Successfully read the following options: \n\n')
     for option in options_list:
-        logfile.write('\tLine ' + str(option[0]) + ': ' + str(option[2:]))
+        logfile.write('\tLine ' + str(option[0]) + ': ' + str(option[3:]))
     logfile.write('\n')
             
     logfile.write('\n\n============= Beginning rules reading ==================================\n\n')               
@@ -379,11 +377,11 @@ def LoadRules(logfile, options):
         opLineNum = option[0]
         opLine = option[1]
         
-        if len(option) != 4:
+        if len(option) != 5:
             raise NoRulesFileException('Line ' + str(opLineNum) + ': Option "' + opLine + '" has wrong format')
             
-        opName = option[2].lower()
-        opVal = option[3].lower()
+        opName = option[3].lower()
+        opVal = option[4].lower()
 
                                             # boolean option
         if opName in bool_options:
@@ -473,8 +471,6 @@ known_rules = [
 
 
 def ParseRule(rule):
-    print(rule)
-    
     line_num = rule[0]
     line = rule[1]
     rule_tokens = rule[2:]
@@ -498,7 +494,11 @@ def ParseRule(rule):
             continue
         
         args = rule_tokens[len(tokens):]
-        return action(args)
+        
+        try:
+            return action(args)
+        except Exception, ex:
+            raise NoRulesFileException('Line ' + str(line_num) + ': ' + str(ex) + '\n' + line)
     
     # If got here not command was matched
     raise NoRulesFileException('Line ' + str(line_num) + ': Rule could not be parsed:\n' + line) 
