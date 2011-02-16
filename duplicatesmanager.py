@@ -149,7 +149,7 @@ def DuplicatesManager(books):
         logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
         logfile.write('Found '+str(len(cl))+ ' different series\n')
                 
-        if VERBOSE:
+        if options["verbose"]:
             for series in sorted(cl.keys()):
                             logfile.write('\t'+series+'\n')
                 
@@ -161,7 +161,7 @@ def DuplicatesManager(books):
                 del cl[series]
         logfile.write('Found '+str(len(cl))+ ' different series with more than one issue\n')
                 
-        if VERBOSE:
+        if options["verbose"]:
             for series in sorted(cl.keys()):
                             logfile.write('\t'+series+'\n')
                 
@@ -196,7 +196,7 @@ def DuplicatesManager(books):
                 del cl[i]
 
         logfile.write('Found '+str(len(cl))+ ' different series with dupes\n')
-        if VERBOSE:
+        if options["verbose"]:
             for series in sorted(cl.keys()):
                             logfile.write('\t'+series+'\t('+str(cl[series].keys())+')\n')
 
@@ -210,7 +210,7 @@ def DuplicatesManager(books):
                         dupe_groups.append(cl[i][j])
         
         logfile.write('Found '+str(len(dupe_groups)) +' groups of dupes, with a total of '+ str(len(reduce(list.__add__, dupe_groups, [])))+ ' ecomics.\n')
-        if VERBOSE:
+        if options["verbose"]:
                 for group in sorted(dupe_groups):
                         logfile.write('\t'+group[0][SERIES]+' #'+group[0][NUMBER]+'\n')
                         for comic in group:
