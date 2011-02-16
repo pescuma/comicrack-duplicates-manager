@@ -87,7 +87,7 @@ def DuplicatesManager(books):
         
         b = dmBookWrapper(book)
         # re.sub(r'^0+','',b.Number) -> removes leading 0's
-        comiclist.append((cleanupseries(b.Series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
+        comiclist.append((cleanupseries(b.Series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,b.FileFormat,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
@@ -281,7 +281,7 @@ def DuplicatesManager(books):
             t_rule.insert(1,options)
             
             t_group = globals()[t_rule[0]](*t_rule[1:])     ### this is the trick to call a function using a string with its name
-                                    
+            
             i_rules = i_rules+1
         
         new_groups.append(t_group)
@@ -458,15 +458,17 @@ known_rules = [
     [ ["covers", "keep", "some"],         lambda args: ["keep_covers_all", "False"] ],
     [ ["covers", "keep", "all"],          lambda args: ["keep_covers_all", "True"] ],
     [ ["filename", "keep"],               lambda args: ["keep_with_words", args, [FILENAME]] ],
-    [ ["filepath", "keep"],               lambda args: ["keep_with_words", args, [FILEPATH]] ],
-    [ ["tags", "keep"],                   lambda args: ["keep_with_words", args, [TAGS]] ],
-    [ ["notes", "keep"],                  lambda args: ["keep_with_words", args, [NOTES]] ],
     [ ["filename", "remove"],             lambda args: ["remove_with_words", args, [FILENAME]] ],
+    [ ["filepath", "keep"],               lambda args: ["keep_with_words", args, [FILEPATH]] ],
     [ ["filepath", "remove"],             lambda args: ["remove_with_words", args, [FILEPATH]] ],
+    [ ["tags", "keep"],                   lambda args: ["keep_with_words", args, [TAGS]] ],
     [ ["tags", "remove"],                 lambda args: ["remove_with_words", args, [TAGS]] ],
+    [ ["notes", "keep"],                  lambda args: ["keep_with_words", args, [NOTES]] ],
     [ ["notes", "remove"],                lambda args: ["remove_with_words", args, [NOTES]] ],
     [ ["text", "keep"],                   lambda args: ["keep_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES]] ],
     [ ["text", "remove"],                 lambda args: ["remove_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES]] ],
+    [ ["filetype", "keep"],               lambda args: ["keep_with_words", args, [FILETYPE]] ],
+    [ ["filetype", "remove"],             lambda args: ["remove_with_words", args, [FILETYPE]] ],
 ]
 
 

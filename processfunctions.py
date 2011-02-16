@@ -288,9 +288,7 @@ def keep_filesize_largest(options, cr, percentage, dgroup, logfile):
     def IsToKeep(comic):
         return comic[FILESIZE] >= min_size
             
-    process_dups(options, cr, IsToKeep, [FILESIZE], dgroup, logfile)
-
-    return dgroup
+    return process_dups(options, cr, IsToKeep, [FILESIZE], dgroup, logfile)
 
 
 def keep_filesize_smallest(options, cr, percentage, dgroup, logfile):
@@ -431,7 +429,7 @@ def keep_with_words(options, cr, words, items, dgroup, logfile):
         
         return False
         
-    return process_dups(options, cr, IsToKeep, [], dgroup, logfile)
+    return process_dups(options, cr, IsToKeep, items, dgroup, logfile)
 
 
 def remove_with_words(options, cr, words, items, dgroup, logfile):
@@ -459,7 +457,7 @@ def remove_with_words(options, cr, words, items, dgroup, logfile):
         
         return True
         
-    return process_dups(options, cr, IsToKeep, [], dgroup, logfile)
+    return process_dups(options, cr, IsToKeep, items, dgroup, logfile)
     
 
     
