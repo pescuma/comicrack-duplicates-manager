@@ -69,255 +69,254 @@ def DuplicatesManager(books):
                 print Exception
     
     logfile = open(LOGFILE,'w')
+    logfile.write('COMICRACK DUPLICATES MANAGER V '+VERSION+'\n\n')
+    ''' Logfile initialized '''
+    
+    #
+    #
+    #########################################
+    
+    
+    
+    #########################################
+    #
+    # Getting comics info
+        
+    comiclist = []
+    for book in books:
+        
+        b = dmBookWrapper(book)
+        # re.sub(r'^0+','',b.Number) -> removes leading 0's
+        comiclist.append((cleanupseries(b.Series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
+
+    logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
+
+   
+    #
+    #
+    ########################################
+
+    #########################################
+    #
+    # Setting intial options values
+
+    options = {"movefiles":MOVEFILES,
+               "removefromlib":REMOVEFROMLIB,
+               "verbose":VERBOSE,
+               "sizemargin":SIZEMARGIN,
+               "coverpages":COVERPAGES,
+               "c2c_noads_gap":C2C_NOADS_GAP}
+                   
+    ########################################
+    #
+    # Main Loop
+    #
+
     try:
-        logfile.write('COMICRACK DUPLICATES MANAGER V '+VERSION+'\n\n')
-        ''' Logfile initialized '''
-        
+     
+        ###########################################
         #
+        # Load rules file
+                
+        rules = LoadRules(logfile, options)
+
         #
-        #########################################
+        ############################################
+
         
         
-        
-        #########################################
+        ############################################
         #
-        # Getting comics info
-            
-        comiclist = []
-        for book in books:
-            
-            b = dmBookWrapper(book)
-            # re.sub(r'^0+','',b.Number) -> removes leading 0's
-            comiclist.append((cleanupseries(b.Series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,book))
-    
+        # Massage comics to get a list of dupes groups
+        
+        ''' Now we group books looking for dupes! '''
+        comiclist.sort()
+        ''' begin sorting and sort the list '''
+
+                # TODO: I need to cleanup the series names and issues 1/2, 0.5, etc...
+                # TODO: Also, check for CVDB items first!
+
+        cl = {}
+        ''' temp dictionary'''
+        for key, group in groupby(comiclist, lambda x: x[SERIES]):
+                cl[key] = list(group)
+                '''groups by series'''
+                ''' cl is a dictionary that now has 'series' as keys'''
+                ''' we remove series with only one ecomic '''
+        
+        logfile.write('============= Begining dupes identification ==================================\n\n')             
+        
         logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
-    
-       
-        #
-        #
-        ########################################
-    
-        #########################################
-        #
-        # Setting intial options values
-    
-        options = {"movefiles":MOVEFILES,
-                   "removefromlib":REMOVEFROMLIB,
-                   "verbose":VERBOSE,
-                   "sizemargin":SIZEMARGIN,
-                   "coverpages":COVERPAGES,
-                   "c2c_noads_gap":C2C_NOADS_GAP}
-                       
-        ########################################
-        #
-        # Main Loop
-        #
-    
-        try:
-         
-            ###########################################
-            #
-            # Load rules file
-                    
-            rules = LoadRules(logfile, options)
-    
-            #
-            ############################################
-    
-            
-            
-            ############################################
-            #
-            # Massage comics to get a list of dupes groups
-            
-            ''' Now we group books looking for dupes! '''
-            comiclist.sort()
-            ''' begin sorting and sort the list '''
-    
-                    # TODO: I need to cleanup the series names and issues 1/2, 0.5, etc...
-                    # TODO: Also, check for CVDB items first!
-    
-            cl = {}
-            ''' temp dictionary'''
-            for key, group in groupby(comiclist, lambda x: x[SERIES]):
-                    cl[key] = list(group)
-                    '''groups by series'''
-                    ''' cl is a dictionary that now has 'series' as keys'''
-                    ''' we remove series with only one ecomic '''
-            
-            logfile.write('============= Begining dupes identification ==================================\n\n')             
-            
-            logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
-            logfile.write('Found '+str(len(cl))+ ' different series\n')
-                    
-            if VERBOSE:
-                for series in sorted(cl.keys()):
-                                logfile.write('\t'+series+'\n')
-                    
-            remove = []
-            for series in cl.keys():
-                    if len(cl[series])==1:
-                                    remove.append(series)   
-            for series in remove:
-                    del cl[series]
-            logfile.write('Found '+str(len(cl))+ ' different series with more than one issue\n')
-                    
-            if VERBOSE:
-                for series in sorted(cl.keys()):
-                                logfile.write('\t'+series+'\n')
-                    
-            ''' we now regroup each series looking for dupe issues '''
-            for series in cl.keys():
-                    cl[series].sort()
-                            
-                    temp_dict = {} 
-                    for key, group in groupby(cl[series], lambda x: x[NUMBER]):
-                            temp_dict[key] = list(group)
-                            cl[series]= temp_dict
-                                    
-            
-                    
-            ''' cleaning issues without dupes '''
-            remove = []
-            for series in cl.keys():
-                    for number in cl[series]:
-                            if len(cl[series][number])==1:
-                                            remove.append((series,number))
-                    
-            for a in remove:
-                    del cl[a[0]][a[1]]
-            
-            
-            ''' now a second go for series without issues after non-dupe removal '''
-            remove = []
-            for i in cl:
-                    if len(cl[i])==0:
-                                    remove.append(i)
-            for i in remove:
-                    del cl[i]
-    
-            logfile.write('Found '+str(len(cl))+ ' different series with dupes\n')
-            if VERBOSE:
-                for series in sorted(cl.keys()):
-                                logfile.write('\t'+series+'\t('+str(cl[series].keys())+')\n')
-    
-                    
-            ''' Now I have them sorted, I convert them to a simple list of lists (groups)...
-            each item in this list is a list of dupes '''
-            
-            dupe_groups = []
-            for i in cl:
-                    for j in cl[i]:
-                            dupe_groups.append(cl[i][j])
-            
-            logfile.write('Found '+str(len(dupe_groups)) +' groups of dupes, with a total of '+ str(len(reduce(list.__add__, dupe_groups, [])))+ ' ecomics.\n')
-            if VERBOSE:
-                    for group in sorted(dupe_groups):
-                            logfile.write('\t'+group[0][SERIES]+' #'+group[0][NUMBER]+'\n')
-                            for comic in group:
-                                    logfile.write('\t\t'+comic[FILENAME]+'\n')
-    
-            dupe_groups.sort()
-    
-            logfile.write('\n============= End of dupes identification=====================================\n\n\n\n')
-            logfile.write('============= Beginning dupes processing =====================================\n\n')
-            
-            del cl
-            
-            #
-            ##########################################################
-            
-            #
-            #      Exception handling
-            #
-    
-        except NoRulesFileException, ex:
-            MessageBox.Show('ERROR: '+ str(ex), "ERROR in Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-            logfile.write('ERROR: '+str(ex)+'\n')
-            print NoRulesFileException
-            return
-            
-        except Exception, ex:
-            logfile.write('ERROR: '+ str(Exception) +' -> '+str(ex)+'\n')
-            print "The following error occured"
-            print Exception
-            print str(ex)
-            return
-            
-            
-        ###################### processing ########################################
-        
-        movedcomics = 0
-        
-        new_groups = []
-        
-        # fix for issue 4 - if there are no dupes, end gracefully
-        if len(dupe_groups) == 0:
-            MessageBox.Show('Script execution completed: No duplicates found in the comics selected', 'Success', MessageBoxButtons.OK, MessageBoxIcon.Information)
-            logfile.write('\n\n\n\ ########################################################### \n\n\n')
-            logfile.write('Scritp execution completed: No duplicates found in the comics selected')
-            
-            del  dupe_groups
-            del new_groups
-            logfile.close()
-            
-            return
-        
-        for group in dupe_groups:
-            
-            t_group = group[:]
-    
-            logfile.write('\n= PROCESSING GROUP_____\n')
-            logfile.write('= '+ t_group[0][SERIES] + ' #'+str(t_group[0][NUMBER])+'\n')
-            logfile.write('\n')
-            
-            i_rules = 0
-            
-            while (len(t_group)> 1) and (i_rules < len(rules)):
-                t_rule = rules[i_rules][:]
+        logfile.write('Found '+str(len(cl))+ ' different series\n')
                 
-                t_rule.append(t_group[:])
-                t_rule.append(logfile)
-                t_rule.insert(1,ComicRack)
-                t_rule.insert(1,options)
+        if VERBOSE:
+            for series in sorted(cl.keys()):
+                            logfile.write('\t'+series+'\n')
                 
-                t_group = globals()[t_rule[0]](*t_rule[1:])     ### this is the trick to call a function using a string with its name
-                                        
-                i_rules = i_rules+1
-            
-            new_groups.append(t_group)
-    
+        remove = []
+        for series in cl.keys():
+                if len(cl[series])==1:
+                                remove.append(series)   
+        for series in remove:
+                del cl[series]
+        logfile.write('Found '+str(len(cl))+ ' different series with more than one issue\n')
+                
+        if VERBOSE:
+            for series in sorted(cl.keys()):
+                            logfile.write('\t'+series+'\n')
+                
+        ''' we now regroup each series looking for dupe issues '''
+        for series in cl.keys():
+                cl[series].sort()
+                        
+                temp_dict = {} 
+                for key, group in groupby(cl[series], lambda x: x[NUMBER]):
+                        temp_dict[key] = list(group)
+                        cl[series]= temp_dict
+                                
         
-        dupe_groups = new_groups[:]
+                
+        ''' cleaning issues without dupes '''
+        remove = []
+        for series in cl.keys():
+                for number in cl[series]:
+                        if len(cl[series][number])==1:
+                                        remove.append((series,number))
+                
+        for a in remove:
+                del cl[a[0]][a[1]]
         
-        remain_comics = len(reduce(list.__add__, new_groups))
         
-        for group in dupe_groups:
-            if len(group) == 1: new_groups.remove(group)
+        ''' now a second go for series without issues after non-dupe removal '''
+        remove = []
+        for i in cl:
+                if len(cl[i])==0:
+                                remove.append(i)
+        for i in remove:
+                del cl[i]
+
+        logfile.write('Found '+str(len(cl))+ ' different series with dupes\n')
+        if VERBOSE:
+            for series in sorted(cl.keys()):
+                            logfile.write('\t'+series+'\t('+str(cl[series].keys())+')\n')
+
+                
+        ''' Now I have them sorted, I convert them to a simple list of lists (groups)...
+        each item in this list is a list of dupes '''
         
-        # new_groups holds now the remaining groups for logging purposes
+        dupe_groups = []
+        for i in cl:
+                for j in cl[i]:
+                        dupe_groups.append(cl[i][j])
         
-        #if len(dupe_groups)>=1:
-        #    print 'Found ',len(dupe_groups), ' groups of dupes, with a total of ', len(reduce(list.__add__, dupe_groups)), ' comics.'
-    
+        logfile.write('Found '+str(len(dupe_groups)) +' groups of dupes, with a total of '+ str(len(reduce(list.__add__, dupe_groups, [])))+ ' ecomics.\n')
+        if VERBOSE:
+                for group in sorted(dupe_groups):
+                        logfile.write('\t'+group[0][SERIES]+' #'+group[0][NUMBER]+'\n')
+                        for comic in group:
+                                logfile.write('\t\t'+comic[FILENAME]+'\n')
+
+        dupe_groups.sort()
+
+        logfile.write('\n============= End of dupes identification=====================================\n\n\n\n')
+        logfile.write('============= Beginning dupes processing =====================================\n\n')
+        
+        del cl
+        
         #
-        #   End of Main Loop
+        ##########################################################
+        
         #
-        ###########################################################
+        #      Exception handling
+        #
+
+    except NoRulesFileException, ex:
+        MessageBox.Show('ERROR: '+ str(ex), "ERROR in Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        logfile.write('ERROR: '+str(ex)+'\n')
+        print NoRulesFileException
+        return
+        
+    except Exception, ex:
+        logfile.write('ERROR: '+ str(Exception) +' -> '+str(ex)+'\n')
+        print "The following error occured"
+        print Exception
+        print str(ex)
+        return
+        
+        
+    ###################### processing ########################################
     
-    #### End report
+    movedcomics = 0
     
-        MessageBox.Show('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n - '+str(len(dupe_groups))+' duplicated groups processed.\n - '+str(len(new_groups))+' duplicated groups remain.\n - '+str(remain_comics)+' comics remain', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
+    new_groups = []
+    
+    # fix for issue 4 - if there are no dupes, end gracefully
+    if len(dupe_groups) == 0:
+        MessageBox.Show('Script execution completed: No duplicates found in the comics selected', 'Success', MessageBoxButtons.OK, MessageBoxIcon.Information)
         logfile.write('\n\n\n\ ########################################################### \n\n\n')
-        logfile.write('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n'+str(len(dupe_groups))+' duplicated groups processed.\n'+str(len(new_groups))+' duplicated groups remain..\n'+str(remain_comics)+' comics remain')
-    
-    #### Garbage collecting
-    
+        logfile.write('Scritp execution completed: No duplicates found in the comics selected')
+        
         del  dupe_groups
         del new_groups
-        
-    finally:
         logfile.close()
+        
+        return
+    
+    for group in dupe_groups:
+        
+        t_group = group[:]
+
+        logfile.write('\n= PROCESSING GROUP_____\n')
+        logfile.write('= '+ t_group[0][SERIES] + ' #'+str(t_group[0][NUMBER])+'\n')
+        logfile.write('\n')
+        
+        i_rules = 0
+        
+        while (len(t_group)> 1) and (i_rules < len(rules)):
+            t_rule = rules[i_rules][:]
+            
+            t_rule.append(t_group[:])
+            t_rule.append(logfile)
+            t_rule.insert(1,ComicRack)
+            t_rule.insert(1,options)
+            
+            t_group = globals()[t_rule[0]](*t_rule[1:])     ### this is the trick to call a function using a string with its name
+                                    
+            i_rules = i_rules+1
+        
+        new_groups.append(t_group)
+
+    
+    dupe_groups = new_groups[:]
+    
+    remain_comics = len(reduce(list.__add__, new_groups))
+    
+    for group in dupe_groups:
+        if len(group) == 1: new_groups.remove(group)
+    
+    # new_groups holds now the remaining groups for logging purposes
+    
+    #if len(dupe_groups)>=1:
+    #    print 'Found ',len(dupe_groups), ' groups of dupes, with a total of ', len(reduce(list.__add__, dupe_groups)), ' comics.'
+
+    #
+    #   End of Main Loop
+    #
+    ###########################################################
+
+#### End report
+
+    MessageBox.Show('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n - '+str(len(dupe_groups))+' duplicated groups processed.\n - '+str(len(new_groups))+' duplicated groups remain.\n - '+str(remain_comics)+' comics remain', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
+    logfile.write('\n\n\n\ ########################################################### \n\n\n')
+    logfile.write('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n'+str(len(dupe_groups))+' duplicated groups processed.\n'+str(len(new_groups))+' duplicated groups remain..\n'+str(remain_comics)+' comics remain')
+
+#### Garbage collecting
+
+    del  dupe_groups
+    del new_groups
+    logfile.close()
+
+    
     
     return
 
