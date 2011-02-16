@@ -465,6 +465,14 @@ def remove_with_words(options, cr, words, items, dgroup, logfile):
 
 # ================ BASE FUNCTION TO HANDLE THE DUPS ================================================
 
+def ToString(v):
+    if v is None:
+        return ''
+    if not isinstance(v, basestring):
+        return str(v)
+    return v
+
+
 def process_dups(options, cr, test_to_keep, fields, dgroup, logfile):
     ''' Removes from the 'group' all comics that test_to_keep('comic') returns false
             dgroup -> list of duplicate comics
@@ -504,7 +512,7 @@ def process_dups(options, cr, test_to_keep, fields, dgroup, logfile):
                 if i > 0:
                     logfile.write(' ')
                 f = fields[i]
-                logfile.write(field_names[f] + '=' + str(comic[f]))
+                logfile.write(field_names[f] + '=' + ToString(comic[f]))
             logfile.write(')')
                 
         logfile.write('\n')
