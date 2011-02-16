@@ -10,11 +10,11 @@
 pagecount	remove	fileless
 covers      keep    some
 filename   keep    edit 
-filename   remove  cover only
+filename   remove  "cover only"
 filename    keep    noads
 pagecount	keep	noads
 text keep Bchry
-filesize	keep	largest	
+filesize	keep	largest	10%
 #
 #
 # filename    keep    c2c
