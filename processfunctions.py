@@ -458,6 +458,22 @@ def remove_with_words(options, cr, words, items, dgroup, logfile):
         return True
         
     return process_dups(options, cr, IsToKeep, items, dgroup, logfile)
+
+
+def keep_first(options, cr, dgroup, logfile):
+    ''' Keeps only the first comic in the group
+            dgroup -> list of duplicate comics
+            logfile -> file object'''
+            
+
+    logfile.write('_________________KEEP_FIRST______________\n')
+    
+    to_keep = dgroup[0]
+
+    def IsToKeep(book):
+        return book == to_keep
+        
+    return process_dups(options, cr, IsToKeep, [], dgroup, logfile)
     
 
     

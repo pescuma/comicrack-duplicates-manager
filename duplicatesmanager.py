@@ -469,6 +469,7 @@ known_rules = [
     [ ["text", "remove"],                 lambda args: ["remove_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES]] ],
     [ ["filetype", "keep"],               lambda args: ["keep_with_words", args, [FILETYPE]] ],
     [ ["filetype", "remove"],             lambda args: ["remove_with_words", args, [FILETYPE]] ],
+    [ ["keep", "first"],                  lambda args: ["keep_first"] ],
 ]
 
 

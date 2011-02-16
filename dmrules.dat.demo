@@ -40,3 +40,4 @@ filesize	keep	largest	10%
 # pagecount   remove  fileless
 # pagecount   keep    noads
 # pagecount   keep    c2c
+# keep        first
