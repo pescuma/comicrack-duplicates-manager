@@ -276,21 +276,17 @@ def keep_filesize_largest(options, cr, percentage, dgroup, logfile):
             dgroup -> list of duplicate comics
             logfile -> file object    '''    
             
-    logfile.write('_________________KEEP_FILESIZE_LARGEST___' + percentage + '%___________\n')
+    logfile.write('_________________KEEP_FILESIZE_LARGEST___' + str(percentage) + '%___________\n')
 
 
     by_size = sorted(dgroup, key=lambda dgroup: dgroup[FILESIZE], reverse=True) # sorts by filesize of covers
-    largest = by_size[0]
+    min_size = by_size[0][FILESIZE] * (1 - percentage/100.0)
     
-    if percentage == 0:
-        def IsToKeep(comic):
-            return comic == largest
-        
-    else:
-        min_size = largest[FILESIZE] * (1 - percentage/100.0)
-        
-        def IsToKeep(comic):
-            return comic[FILESIZE] >= min_size
+    if options["verbose"]:
+        logfile.write('Keeping all files with size at least ' + str(min_size) + '\n')
+    
+    def IsToKeep(comic):
+        return comic[FILESIZE] >= min_size
             
     process_dups(options, cr, IsToKeep, [FILESIZE], dgroup, logfile)
 
@@ -302,8 +298,7 @@ def keep_filesize_smallest(options, cr, percentage, dgroup, logfile):
             dgroup -> list of duplicate comics
             logfile -> file object    '''  
     
-    logfile.write('_________________KEEP_FILESIZE_SMALLEST__' + percentage + '%____________\n')
-
+    logfile.write('_________________KEEP_FILESIZE_SMALLEST__' + str(percentage) + '%____________\n')
 
     by_size = sorted(dgroup, key=lambda dgroup: dgroup[FILESIZE], reverse=False) # sorts by filesize of covers
                          
@@ -312,24 +307,16 @@ def keep_filesize_smallest(options, cr, percentage, dgroup, logfile):
         if comic[PAGECOUNT] == 0:
             by_size.remove(comic)
 
-    
     if len(by_size) < 1:
-        # Keep all because they are all fileless
-        def IsToKeep(comic):
-            return True 
-    
-    elif percentage == 0:
-        smallest = by_size[0]
-        
-        def IsToKeep(comic):
-            return comic == smallest or comic[PAGECOUNT] == 0 
-        
+        max_size = 0
     else:
-        smallest = by_size[0]
-        max_size = smallest[FILESIZE] * (1 + percentage/100.0)
+        max_size = by_size[0][FILESIZE] * (1 + percentage/100.0)
+    
+    if options["verbose"]:
+        logfile.write('Keeping all files with size at max ' + str(max_size) + '\n')
         
-        def IsToKeep(comic):
-            return comic[FILESIZE] <= max_size
+    def IsToKeep(comic):
+        return comic[FILESIZE] <= max_size
             
     return process_dups(options, cr, IsToKeep, [FILESIZE, PAGECOUNT], dgroup, logfile)
 
@@ -403,17 +390,17 @@ def fix_words_for_testing(words):
     
         ''' some common substitutions .... more can be added '''
         if word in ('c2c', 'ctc', 'fiche'): 
-            wordlist.append(['c2c', 'ctc', 'fiche'])
+            wordlist.extend(['c2c', 'ctc', 'fiche'])
         elif word in ('noads'): 
-            wordlist.append(['noads', 'no ads'])
+            wordlist.extend(['noads', 'no ads'])
         elif word in ('(f)', 'fixed'): 
-            wordlist.append(['(f)', 'fixed'])
+            wordlist.extend(['(f)', 'fixed'])
         elif word in ('(f)', 'fiche'): 
-            wordlist.append(['(f)', 'fiche'])
+            wordlist.extend(['(f)', 'fiche'])
         elif word in ('zip','cbz'): 
-            wordlist.append(['zip','cbz'])
+            wordlist.extend(['zip','cbz'])
         elif word in ('rar','cbr'): 
-            wordlist.append(['rar','cbr'])
+            wordlist.extend(['rar','cbr'])
         else:
             wordlist.append(cleanupseries(word))
     
@@ -444,7 +431,7 @@ def keep_with_words(options, cr, words, items, dgroup, logfile):
         
         return False
         
-    return process_dups(options, cr, IsToKeep, (FILENAME), dgroup, logfile)
+    return process_dups(options, cr, IsToKeep, [], dgroup, logfile)
 
 
 def remove_with_words(options, cr, words, items, dgroup, logfile):
@@ -493,25 +480,25 @@ def process_dups(options, cr, test_to_keep, fields, dgroup, logfile):
         if test_to_keep(comic):
             if comic not in to_keep: 
                 to_keep.append(comic)
-            break
+            continue
         
         if comic not in to_keep: 
             to_remove.append(comic)
-
+    
     # Make sure at least 1 book remains!!!!
-    if len(to_keep) < 0:
+    if len(to_keep) < 1:
         logfile.write('Filter would remove all items, so it will be ignored\n')
         to_keep = dgroup[:]
         to_remove = []
-
-    # Log comic actions    
+    
+    # Log comic actions
     for comic in dgroup:
         if comic in to_keep:
             logfile.write('keeping... ')
         else:
             logfile.write('removing... ')
         
-        logfile.write(str(comic[FILENAME]))
+        logfile.write(comic[FILENAME])
         
         if len(fields) > 0:
             logfile.write(' (')
@@ -519,7 +506,7 @@ def process_dups(options, cr, test_to_keep, fields, dgroup, logfile):
                 if i > 0:
                     logfile.write(' ')
                 f = fields[i]
-                logfile.write(names[f] + '=' + str(comic(f)))
+                logfile.write(field_names[f] + '=' + str(comic[f]))
             logfile.write(')')
                 
         logfile.write('\n')

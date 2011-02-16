@@ -52,6 +52,7 @@ SCRIPTDIRECTORY = __file__[0:-len("constants.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
 LOGFILE = Path.Combine(DUPESDIRECTORY, "logfile.log")
 (SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,NOTES,BOOK) = range(12)
+field_names = ['series','number','volume','filename','pages','size','id','cvdb_id','path','tags','notes','book']
 
 #
 #
