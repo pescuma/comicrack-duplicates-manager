@@ -388,32 +388,45 @@ def keep_covers_all(options, cr, option, dgroup, logfile):
 
 
 # =================== WORD SEARCH FUNCTIONS ========================================================    
-        
-def keep_with_word(options, cr, word, items, dgroup, logfile):
-    ''' Removes from the 'group' all comics that do not include 'word'
+
+def fix_words_for_testing(words):
+    wordlist = []
+    
+    for word in words:
+        word = word.lower()
+    
+        ''' some common substitutions .... more can be added '''
+        if word in ('c2c', 'ctc', 'fiche'): 
+            wordlist.append(['c2c', 'ctc', 'fiche'])
+        elif word in ('noads'): 
+            wordlist.append(['noads', 'no ads'])
+        elif word in ('(f)', 'fixed'): 
+            wordlist.append(['(f)', 'fixed'])
+        elif word in ('(f)', 'fiche'): 
+            wordlist.append(['(f)', 'fiche'])
+        elif word in ('zip','cbz'): 
+            wordlist.append(['zip','cbz'])
+        elif word in ('rar','cbr'): 
+            wordlist.append(['rar','cbr'])
+        else:
+            wordlist.append(cleanupseries(word))
+    
+    return wordlist
+
+
+def keep_with_words(options, cr, words, items, dgroup, logfile):
+    ''' Removes from the 'group' all comics that do not include any of the words
         in the fields 'item'
             dgroup -> list of duplicate comics
             logfile -> file object
-            word -> text string to be searched
+            words -> text strings to be searched
             items -> LIST of fields to search in'''
 
-    logfile.write('_________________KEEP_WITH_WORD______'+word+'________\n')
+    logfile.write('_________________KEEP_WITH_WORDS______' + str(words) + '________\n')
 
-    word = word.lower()
-    wordlist = [word,]
+    wordlist = fix_words_for_testing(words)
 
-    ''' some common substitutions .... more can be added '''
-    if word in ('c2c', 'ctc', 'fiche'): wordlist = ('c2c', 'ctc', 'fiche')
-    if word in ('noads') : wordlist = ('noads', 'no ads')
-    if word in ('(f)', 'fixed'): wordlist = ('(f)', 'fixed')
-    if word in ('(f)', 'fiche'): wordlist = ('(f)', 'fiche')
-    if word in ('zip','cbz'): wordlist = ('zip','cbz')
-    if word in ('rar','cbr'): wordlist = ('rar','cbr')
-
-    to_keep = []
-    to_remove = []
-    
-    for comic in dgroup:
+    def IsToKeep(comic):
         searchstring = ""
         for item in items:
             searchstring = searchstring + " " + cleanupseries(comic[item])
@@ -421,37 +434,16 @@ def keep_with_word(options, cr, word, items, dgroup, logfile):
         
         for word in wordlist:
             if searchstring.find(word) != -1:    #word found
-                if comic not in to_keep: to_keep.append(comic)
-                break
-        if comic not in to_keep: to_remove.append(comic)
-                
-                
-    if len(to_keep)>=1:     # Make sure at least 1 book remains!!!!
-        for comic in dgroup:
-            if comic in to_keep:
-                logfile.write('keeping...'+str(comic[FILENAME])+'\n')
-            else:
-                logfile.write('removing...'+str(comic[FILENAME])+'\n')
+                return True
         
-        print to_keep
-        print to_remove
+        return False
         
-        if to_remove != []: deletecomics(options, cr, to_remove, logfile)
-                
-        dgroup = to_keep[:]
-        
-
-    else:
-        for comic in dgroup:
-            logfile.write('keeping...'+str(comic[FILENAME])+'\n')
-    
-    del to_keep
-    del to_remove
+    process_dups(options, cr, IsToKeep, dgroup, logfile)
     
     return dgroup
 
 
-def remove_with_word(options, cr, word, items, dgroup, logfile):
+def remove_with_words(options, cr, words, items, dgroup, logfile):
     ''' Removes from the 'group' all comics that do not include 'word'
         in the fields 'item'
             dgroup -> list of duplicate comics
@@ -460,58 +452,72 @@ def remove_with_word(options, cr, word, items, dgroup, logfile):
             items -> LIST of fields to search in'''
             
 
-    logfile.write('_________________REMOVE_WITH_WORD______'+word+'________\n')
+    logfile.write('_________________REMOVE_WITH_WORDS______' + str(words) + '________\n')
 
-    word = word.lower()
-    wordlist = [word,]
-    
-    ''' some common substitutions .... more can be added '''
-    if word in ('c2c', 'ctc', 'fiche'): wordlist = ('c2c', 'ctc', 'fiche')
-    if word in ('noads') : wordlist = ('noads', 'no ads')
-    if word in ('(f)', 'fixed'): wordlist = ('(f)', 'fixed')
-    if word in ('(f)', 'fiche'): wordlist = ('(f)', 'fiche')
+    wordlist = fix_words_for_testing(words)
 
-    to_keep = []    
-    to_remove = []
-                            
-    for comic in dgroup:
+    def IsToKeep(book):
         searchstring = ""
         for item in items:
             searchstring = searchstring + " " + cleanupseries(comic[item])
-        ''' adds all search files together '''
+            ''' adds all search strings together '''
         
         for word in wordlist:
-            if searchstring.find(word) != -1: # word found
-                if comic not in to_remove: to_remove.append(comic)
-                break    
-            else:
-                if comic not in to_keep: to_keep.append(comic)
-                    
-                
-    if len(to_keep)>=1:     # Make sure at least 1 book remains!!!!
-   
-        for comic in dgroup:
-            if comic in to_keep:
-                logfile.write('keeping...'+str(comic[item])+'\n')
-            else:
-                logfile.write('removing...'+str(comic[item])+'\n')
-  
-        if to_remove != []: deletecomics(options, cr,to_remove, logfile)
+            if searchstring.find(word) != -1:    #word found
+                return False
         
-        dgroup = to_keep[:]
-
-    else:                    # Else no comic is removing!!!!!
-        for comic in dgroup:
-            logfile.write('keeping...'+str(comic[item])+'\n')
+        return True
+        
+    process_dups(options, cr, IsToKeep, dgroup, logfile)
     
-    del to_remove
-    del to_keep
-       
     return dgroup
     
 
     
 ###################################################################################################
+
+# ================ BASE FUNCTION TO HANDLE THE DUPS ================================================
+
+def process_dups(options, cr, test_to_keep, dgroup, logfile):
+    ''' Removes from the 'group' all comics that test_to_keep('comic') returns false
+            dgroup -> list of duplicate comics
+            logfile -> file object
+            test_to_keep -> function to do the tesing'''
+
+    to_keep = []
+    to_remove = []
+    
+    for comic in dgroup:
+        if test_to_keep(comic):
+            if comic not in to_keep: 
+                to_keep.append(comic)
+            break
+        
+        if comic not in to_keep: 
+            to_remove.append(comic)
+
+    if len(to_keep)>=1:     # Make sure at least 1 book remains!!!!
+        for comic in dgroup:
+            if comic in to_keep:
+                logfile.write('keeping... ' + str(comic[FILENAME]) + '\n')
+            else:
+                logfile.write('removing... ' + str(comic[FILENAME]) + '\n')
+        
+        if to_remove != []: 
+            deletecomics(options, cr, to_remove, logfile)
+                
+        dgroup = to_keep[:]
+
+    else:
+        logfile.write('Filter would remove all items, so it will be ignored\n')
+        for comic in dgroup:
+            logfile.write('keeping... ' + str(comic[FILENAME]) + '\n')
+    
+    del to_keep
+    del to_remove
+    
+    return dgroup
+
 
 # ================ DELETE COMICS FUNCTION ==========================================================
 
