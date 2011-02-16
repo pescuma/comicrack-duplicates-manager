@@ -319,6 +319,7 @@ def keep_covers_all(options, cr, option, dgroup, logfile):
         searchstring = searchstring.replace("(both","(2")
         searchstring = searchstring.lower()
 
+      
         m = re.search('\((\d*) +covers\)', searchstring)
         if m:
             with_covers.append((comic, int(m.groups(0)[0])))
@@ -332,8 +333,9 @@ def keep_covers_all(options, cr, option, dgroup, logfile):
         dgroup = []
         with_covers = sorted(with_covers, key=lambda to_keep: to_keep[1], reverse=True) # sorts by number of covers
         max = with_covers[0][1] # max number of covers found
-            
-        for (comic,covers) in with_covers:
+        
+        temp_with_covers = with_covers[:]  
+        for (comic,covers) in temp_with_covers:
             if covers < max:
                 with_covers.remove((comic,covers))
                 to_remove.append(comic)
@@ -342,6 +344,7 @@ def keep_covers_all(options, cr, option, dgroup, logfile):
                 # logfile.write('keeping... '+ comic[FILENAME]+'\n')
                 to_keep.append(comic)
 
+        
         for comic in to_keep:
             dgroup.append(comic)
             logfile.write('keeping... '+ comic[FILENAME]+'\n')
