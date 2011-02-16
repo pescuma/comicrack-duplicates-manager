@@ -454,7 +454,7 @@ known_rules = [
     [ ["pagecount", "keep", "c2c"],       lambda args: ["keep_pagecount_c2c"] ],
     [ ["pagecount", "remove", "fileless"],lambda args: ["remove_pagecount_fileless"] ],
     [ ["filesize", "keep", "largest"],    lambda args: ["keep_filesize_largest", AsPercentage(args, 0, "0%")] ],
-    [ ["filesize", "keep", "smallest"],   lambda args: ["keep_filesize_smallest"] ],
+    [ ["filesize", "keep", "smallest"],   lambda args: ["keep_filesize_smallest", AsPercentage(args, 0, "0%")] ],
     [ ["covers", "keep", "some"],         lambda args: ["keep_covers_all", "False"] ],
     [ ["covers", "keep", "all"],          lambda args: ["keep_covers_all", "True"] ],
     [ ["filename", "keep"],               lambda args: ["keep_with_words", args, [FILENAME]] ],
