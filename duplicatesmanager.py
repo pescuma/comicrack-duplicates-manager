@@ -448,8 +448,8 @@ def AsPercentage(args, index, defVal):
 
 known_rules = [
     [ ["pagecount", "keep", "fileless"],  lambda args: ["keep_pagecount_fileless"] ],
-    [ ["pagecount", "keep", "largest"],   lambda args: ["keep_pagecount_largest"] ],
-    [ ["pagecount", "keep", "smallest"],  lambda args: ["keep_pagecount_smallest"] ],
+    [ ["pagecount", "keep", "largest"],   lambda args: ["keep_pagecount_largest", AsPercentage(args, 0, "0%")] ],
+    [ ["pagecount", "keep", "smallest"],  lambda args: ["keep_pagecount_smallest", AsPercentage(args, 0, "0%")] ],
     [ ["pagecount", "keep", "noads"],     lambda args: ["keep_pagecount_noads"] ],
     [ ["pagecount", "keep", "c2c"],       lambda args: ["keep_pagecount_c2c"] ],
     [ ["pagecount", "remove", "fileless"],lambda args: ["remove_pagecount_fileless"] ],

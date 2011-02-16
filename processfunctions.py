@@ -111,73 +111,51 @@ def keep_pagecount_c2c(options, cr, dgroup, logfile):
     return dgroup
 
 
-def keep_pagecount_largest(options, cr, dgroup, logfile):
+def keep_pagecount_largest(options, cr, percentage, dgroup, logfile):
     ''' Keeps from the 'dgroup' the ones with most pages
             dgroup -> list of duplicate comics
             logfile -> file object    '''
     
-    logfile.write('_________________KEEP_PAGECOUNT_MOST______________\n')
+    logfile.write('_________________KEEP_PAGECOUNT_MOST___' + str(percentage) + '%___________\n')
 
-    to_keep = []
-    to_remove = []     
-
-    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by number of pages
-
-    i=0                               #keeps the first one
-    to_keep.append(by_size[i])
-    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
+    by_pages = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=True) # sorts by number of pages
+    min_pages = by_pages[0][PAGECOUNT] * (1 - percentage/100.0)
     
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
-            to_keep.append(by_size[i+1])
-            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-            i = i+1
-    for j in range (i+1,len(by_size)):
-        to_remove.append(by_size[j])
-        logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-                      
+    if options["verbose"]:
+        logfile.write('Keeping all files with at least ' + str(min_pages) + ' pages\n')
     
-    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
-    dgroup = to_keep[:]
-    
-    return dgroup
+    def IsToKeep(comic):
+        return comic[PAGECOUNT] >= min_pages
+            
+    return process_dups(options, cr, IsToKeep, [PAGECOUNT], dgroup, logfile)
 
 
-def keep_pagecount_smallest(options, cr, dgroup, logfile):
+def keep_pagecount_smallest(options, cr, percentage, dgroup, logfile):
     ''' Keeps from the 'group' the one with less pages
             dgroup -> list of duplicate comics
             logfile -> file object    '''
     
-    logfile.write('_________________KEEP_PAGECOUNT_LESS______________\n')
+    logfile.write('_________________KEEP_PAGECOUNT_LESS____' + str(percentage) + '%__________\n')
     
-    to_keep =[]
-    to_remove = []  
-    
-    by_size = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by number of pages
-    
-    # remove fileless:
-    
-    for comic in by_size:
-        if comic[PAGECOUNT] == 0:
-            by_size.remove(comic)
-            logfile.write('keeping... '+ comic[SERIES]+' #' + comic[NUMBER] + ' (fileless)\n') 
+    by_pages = sorted(dgroup, key=lambda dgroup: dgroup[PAGECOUNT], reverse=False) # sorts by filesize of covers
                          
-    i=0                               #keeps the first one
-    to_keep.append(by_size[i])
-    logfile.write('keeping... '+ by_size[i][FILENAME]+' (pages '+str(by_size[i][PAGECOUNT])+')\n')
+    # keep fileless
+    for comic in by_pages:
+        if comic[PAGECOUNT] == 0:
+            by_pages.remove(comic)
+
+    if len(by_pages) < 1:
+        max_pages = 0
+    else:
+        max_pages = by_pages[0][PAGECOUNT] * (1 + percentage/100.0)
+    
+    if options["verbose"]:
+        logfile.write('Keeping all files with at max ' + str(max_pages) + ' pages\n')
         
-    
-    while (i<len(by_size)-1) and (int(by_size[i+1][PAGECOUNT]) == (int(by_size[i][PAGECOUNT]))):
-            to_keep.append(by_size[i+1])
-            logfile.write('keeping... '+ by_size[i+1][FILENAME]+' (pages '+str(by_size[i+1][PAGECOUNT])+')\n') 
-            i = i+1
-    for j in range (i+1,len(by_size)):
-        to_remove.append(by_size[j])
-        logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
-                      
-    
-    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
-    dgroup = to_keep[:]
-    return dgroup
+    def IsToKeep(comic):
+        return comic[PAGECOUNT] <= max_pages
+            
+    return process_dups(options, cr, IsToKeep, [PAGECOUNT], dgroup, logfile)
 
     
 def keep_pagecount_fileless(options, cr, dgroup, logfile):
