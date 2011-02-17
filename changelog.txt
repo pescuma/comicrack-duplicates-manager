@@ -1,3 +1,12 @@
+v0.6 -> New Features Release
+
+   Added:    - New parser (texts with more than one word can be surrounded by ")
+             - Percentage option to filesize keep/remove
+             - Added percentage option to pagecount keep/remove largest/smallest
+             - Added keep first (to remove remaining identical files)
+             - Allow filter multiple words (using any of then) in texts
+
+
 v0.5 -> 
 
    Fixed:   - Major bug found in the 'text' rules!!!!!
