@@ -87,12 +87,7 @@ def DuplicatesManager(books):
         
     finally:
         logfile.close()
-    
-def show_frame(logfile, num, frame):
-    logfile.write(str(frame) + '\n')
-    logfile.write("  frame     = sys._getframe(%s)\n" % num)
-    logfile.write("  function  = %s()\n" % frame.f_code.co_name)
-    logfile.write("  file/line = %s:%s\n" % (frame.f_code.co_filename, frame.f_lineno))
+
     
 
 def ProcessDuplicates(books, logfile):
