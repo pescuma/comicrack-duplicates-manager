@@ -16,6 +16,7 @@
 #
 #    Import section
 
+import sys, traceback
 import re
 import clr
 import System
@@ -31,6 +32,7 @@ from dmBookWrapper import *
 from utilsbycory import cleanupseries
 from processfunctions import *
 from dmParser import *
+from utilsbycory import *
 
 from constants import *
 
@@ -64,9 +66,8 @@ def DuplicatesManager(books):
         try:
             Directory.CreateDirectory(DUPESDIRECTORY)
         except Exception, ex:
-                MessageBox.Show('ERROR: '+ str(ex), "ERROR creating dump directory" + DUPESDIRECTORY, MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-                logfile.write('ERROR: '+str(ex)+'\n')
-                print Exception
+            MessageBox.Show('ERROR: '+ str(ex), "ERROR creating dump directory" + DUPESDIRECTORY, MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            return
     
     logfile = open(LOGFILE,'w')
     logfile.write('COMICRACK DUPLICATES MANAGER V '+VERSION+'\n\n')
@@ -76,7 +77,25 @@ def DuplicatesManager(books):
     #
     #########################################
     
+    try:
+        ProcessDuplicates(books, logfile)
     
+    except Exception, ex:
+        logfile.write('\n\nSTOPPED PROCESSING BECAUSE OF EXCEPTION:\n')
+        traceback.print_exc(None, logfile, False)
+        raise ex
+        
+    finally:
+        logfile.close()
+    
+def show_frame(logfile, num, frame):
+    logfile.write(str(frame) + '\n')
+    logfile.write("  frame     = sys._getframe(%s)\n" % num)
+    logfile.write("  function  = %s()\n" % frame.f_code.co_name)
+    logfile.write("  file/line = %s:%s\n" % (frame.f_code.co_filename, frame.f_lineno))
+    
+
+def ProcessDuplicates(books, logfile):
     
     #########################################
     #
@@ -275,6 +294,13 @@ def DuplicatesManager(books):
         while (len(t_group)> 1) and (i_rules < len(rules)):
             t_rule = rules[i_rules][:]
             
+            logfile.write('_________________')
+            logfile.write(t_rule[0].upper())
+            for p in range(1, len(t_rule)):
+                logfile.write('___')
+                logfile.write(ToString(t_rule[p]))
+            logfile.write('_________________\n')
+            
             t_rule.append(t_group[:])
             t_rule.append(logfile)
             t_rule.insert(1,ComicRack)
@@ -314,10 +340,7 @@ def DuplicatesManager(books):
 
     del  dupe_groups
     del new_groups
-    logfile.close()
 
-    
-    
     return
 
 
@@ -448,13 +471,17 @@ def AsPercentage(args, index, defVal):
 
 known_rules = [
     [ ["pagecount", "keep", "fileless"],  lambda args: ["keep_pagecount_fileless"] ],
+    [ ["pagecount", "remove", "fileless"],lambda args: ["remove_pagecount_fileless"] ],
     [ ["pagecount", "keep", "largest"],   lambda args: ["keep_pagecount_largest", AsPercentage(args, 0, "0%")] ],
+    [ ["pagecount", "remove", "largest"], lambda args: ["remove_pagecount_largest", AsPercentage(args, 0, "0%")] ],
     [ ["pagecount", "keep", "smallest"],  lambda args: ["keep_pagecount_smallest", AsPercentage(args, 0, "0%")] ],
+    [ ["pagecount", "remove", "smallest"],lambda args: ["remove_pagecount_smallest", AsPercentage(args, 0, "0%")] ],
     [ ["pagecount", "keep", "noads"],     lambda args: ["keep_pagecount_noads"] ],
     [ ["pagecount", "keep", "c2c"],       lambda args: ["keep_pagecount_c2c"] ],
-    [ ["pagecount", "remove", "fileless"],lambda args: ["remove_pagecount_fileless"] ],
     [ ["filesize", "keep", "largest"],    lambda args: ["keep_filesize_largest", AsPercentage(args, 0, "0%")] ],
+    [ ["filesize", "remove", "largest"],  lambda args: ["remove_filesize_largest", AsPercentage(args, 0, "0%")] ],
     [ ["filesize", "keep", "smallest"],   lambda args: ["keep_filesize_smallest", AsPercentage(args, 0, "0%")] ],
+    [ ["filesize", "remove", "smallest"], lambda args: ["remove_filesize_smallest", AsPercentage(args, 0, "0%")] ],
     [ ["covers", "keep", "some"],         lambda args: ["keep_covers_all", False] ],
     [ ["covers", "keep", "all"],          lambda args: ["keep_covers_all", True] ],
     [ ["filename", "keep"],               lambda args: ["keep_with_words", args, [FILENAME]] ],
