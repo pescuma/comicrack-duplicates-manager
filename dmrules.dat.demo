@@ -32,10 +32,18 @@ filesize	keep	largest	10%
 # text        remove  c2c
 # covers      keep    all
 # covers      keep	  some
+# filesize    keep    largest
 # filesize    keep    largest	10%
+# filesize    remove  largest
+# filesize    remove  largest	10%
+# filesize    keep    smallest
 # filesize    keep    smallest	10%
+# filesize    remove  smallest
+# filesize    remove  smallest	10%
 # pagecount   keep    largest
+# pagecount   remove  largest
 # pagecount   keep    smallest
+# pagecount   remove  smallest
 # pagecount   keep    fileless
 # pagecount   remove  fileless
 # pagecount   keep    noads

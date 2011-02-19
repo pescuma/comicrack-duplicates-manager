@@ -1,3 +1,15 @@
+v0.7 -> 
+
+   Added:    - New rules: 
+                    - pagecount remove largest
+                    - pagecount remove smallest
+                    - filesize remove largest
+		    - filesize remove smallest
+             - Now it copies some comic information from deleted comics. It is disabled per default. 
+               Enable in constants.py : UPDATEINFO
+             - Fix for series with multiple volumes
+
+
 v0.6 -> New Features Release
 
    Added:    - New parser (texts with more than one word can be surrounded by ")
