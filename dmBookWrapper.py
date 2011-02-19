@@ -39,6 +39,7 @@ clr.AddReference('System.Drawing')
 import sys
 import System
 from getcvdb import extract_issue_ref
+from utilsbycory import *
 
 
 
@@ -150,19 +151,19 @@ class dmBookWrapper:
 	def GetSeries(self):
 		ret = self.raw.Series
 		if ret:
-			return ret
+			return ToString(ret)
 		ret = self.raw.ShadowSeries
 		if ret:
-			return ret
+			return ToString(ret)
 		return ''
 	
 	def GetVolume(self):
 		ret = self.raw.Volume
 		if ret != -1:
-			return str(ret)
+			return ToString(ret)
 		ret = self.raw.ShadowVolume
 		if ret != -1:
-			return str(ret)
+			return ToString(ret)
 		return ''
 	
 	def GetNumber(self):
@@ -211,7 +212,7 @@ class dmBookWrapper:
 
 
 	def GetId(self):
-		return self.raw.Id
+		return ToString(self.raw.Id)
 	
 	def GetPageCount(self):
 		return self.raw.PageCount
@@ -220,7 +221,7 @@ class dmBookWrapper:
 		return self.raw.FileSize
 
 	def GetCVDB_ID(self):
-		return extract_issue_ref(self.raw)
+		return ToString(extract_issue_ref(self.raw))
 
 
 	# Properties

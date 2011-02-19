@@ -56,7 +56,6 @@ from constants import *
 
 def DuplicatesManager(books):
 
-
     ########################################
     #
     # Starting log file
@@ -88,7 +87,7 @@ def DuplicatesManager(books):
     finally:
         logfile.close()
 
-    
+
 
 def ProcessDuplicates(books, logfile):
     
@@ -101,7 +100,10 @@ def ProcessDuplicates(books, logfile):
         
         b = dmBookWrapper(book)
         # re.sub(r'^0+','',b.Number) -> removes leading 0's
-        comiclist.append((cleanupseries(b.Series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,b.FileFormat,book))
+        series = b.Series
+        if b.Volume:
+            series += ' Vol.' + b.Volume
+        comiclist.append((cleanupseries(series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,b.FileFormat,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
@@ -166,7 +168,7 @@ def ProcessDuplicates(books, logfile):
         if options["verbose"]:
             for series in sorted(cl.keys()):
                             logfile.write('\t'+series+'\n')
-                
+        
         remove = []
         for series in cl.keys():
                 if len(cl[series])==1:
@@ -186,7 +188,7 @@ def ProcessDuplicates(books, logfile):
                 temp_dict = {} 
                 for key, group in groupby(cl[series], lambda x: x[NUMBER]):
                         temp_dict[key] = list(group)
-                        cl[series]= temp_dict
+                        cl[series] = temp_dict
                                 
         
                 
@@ -195,7 +197,7 @@ def ProcessDuplicates(books, logfile):
         for series in cl.keys():
                 for number in cl[series]:
                         if len(cl[series][number])==1:
-                                        remove.append((series,number))
+                                        remove.append([series,number])
                 
         for a in remove:
                 del cl[a[0]][a[1]]
@@ -213,7 +215,6 @@ def ProcessDuplicates(books, logfile):
         if options["verbose"]:
             for series in sorted(cl.keys()):
                             logfile.write('\t'+series+'\t('+str(cl[series].keys())+')\n')
-
                 
         ''' Now I have them sorted, I convert them to a simple list of lists (groups)...
         each item in this list is a list of dupes '''
@@ -246,15 +247,8 @@ def ProcessDuplicates(books, logfile):
 
     except NoRulesFileException, ex:
         MessageBox.Show('ERROR: '+ str(ex), "ERROR in Rules File", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-        logfile.write('ERROR: '+str(ex)+'\n')
-        print NoRulesFileException
-        return
-        
-    except Exception, ex:
-        logfile.write('ERROR: '+ str(Exception) +' -> '+str(ex)+'\n')
-        print "The following error occured"
-        print Exception
-        print str(ex)
+        logfile.write('\n\nERROR in Rules File:\n')
+        traceback.print_exc(None, logfile, False)
         return
         
         
@@ -270,10 +264,8 @@ def ProcessDuplicates(books, logfile):
         logfile.write('\n\n\n\ ########################################################### \n\n\n')
         logfile.write('Scritp execution completed: No duplicates found in the comics selected')
         
-        del  dupe_groups
+        del dupe_groups
         del new_groups
-        logfile.close()
-        
         return
     
     for group in dupe_groups:
@@ -282,19 +274,19 @@ def ProcessDuplicates(books, logfile):
 
         logfile.write('\n= PROCESSING GROUP_____\n')
         logfile.write('= '+ t_group[0][SERIES] + ' #'+str(t_group[0][NUMBER])+'\n')
-        logfile.write('\n')
         
         i_rules = 0
         
         while (len(t_group)> 1) and (i_rules < len(rules)):
             t_rule = rules[i_rules][:]
             
-            logfile.write('_________________')
-            logfile.write(t_rule[0].upper())
-            for p in range(1, len(t_rule)):
-                logfile.write('___')
-                logfile.write(ToString(t_rule[p]))
-            logfile.write('_________________\n')
+            line = t_rule[0]
+            t_rule = t_rule[1:]
+            
+            logfile.write('\n_________________  ')
+            logfile.write(line)
+            logfile.write('  _________________\n')
+            logfile.flush()
             
             t_rule.append(t_group[:])
             t_rule.append(logfile)
@@ -333,7 +325,7 @@ def ProcessDuplicates(books, logfile):
 
 #### Garbage collecting
 
-    del  dupe_groups
+    del dupe_groups
     del new_groups
 
     return
@@ -521,7 +513,9 @@ def ParseRule(rule):
         args = rule_tokens[len(tokens):]
         
         try:
-            return action(args)
+            result = [line]
+            result.extend(action(args))
+            return result
         except Exception, ex:
             raise NoRulesFileException('Line ' + str(line_num) + ': ' + str(ex) + '\n' + line)
     

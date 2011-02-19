@@ -427,7 +427,7 @@ def keep_first(options, cr, dgroup, logfile):
     def IsToKeep(book):
         return book == to_keep
         
-    return process_dups(options, cr, IsToKeep, [], dgroup, logfile)
+    return process_dups(options, cr, IsToKeep, True, [], dgroup, logfile)
     
 
     
@@ -466,11 +466,11 @@ def process_dups(options, cr, test_to_keep, keep_if_test_is_true, fields, dgroup
             logfile.write('keeping... ')
         else:
             logfile.write('removing... ')
-        
+
         logfile.write(comic[FILENAME])
         
-        if len(fields) > 0:
-            logfile.write(' (')
+        if options["verbose"] and len(fields) > 0:
+            logfile.write('                 (')        
             for i in range(len(fields)):
                 if i > 0:
                     logfile.write(' ')
@@ -479,6 +479,7 @@ def process_dups(options, cr, test_to_keep, keep_if_test_is_true, fields, dgroup
             logfile.write(')')
                 
         logfile.write('\n')
+        logfile.flush()
     
     # Delete boolks
     if to_remove != []: 
@@ -502,7 +503,7 @@ def deletecomics(options, cr, deletelist, logfile):
         except Exception, ex:
                 MessageBox.Show('ERROR: '+ str(ex), "ERROR creating dump directory" + DUPESDIRECTORY, MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 logfile.write('ERROR: '+str(ex)+'\n')
-                print Exception
+                return
     
     for comic in deletelist:
         

@@ -83,11 +83,11 @@ def convertnumberwords(phrase_s, expand_b):
 
 ### Other util methods
 
+import System
+
 
 def ToString(v):
     if v is None:
         return ''
-    if not isinstance(v, basestring):
-        return str(v)
-    return v
+    return unicode(v).encode(System.Text.Encoding.Default.BodyName, 'replace')
 
