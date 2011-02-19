@@ -73,10 +73,10 @@ def keep_pagecount_noads(options, cr, dgroup, logfile):
         to_remove.append(by_size[j])
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
             
-    deletecomics(options, cr,to_remove, logfile)    
-    dgroup = to_keep[:]
-    
-    return dgroup
+    updateinfo(options, to_remove, to_keep, logfile)
+    deletecomics(options, cr, to_remove, logfile)
+        
+    return to_keep[:]
 
 
 def keep_pagecount_c2c(options, cr, dgroup, logfile):
@@ -102,10 +102,11 @@ def keep_pagecount_c2c(options, cr, dgroup, logfile):
         to_remove.append(by_size[j])
         logfile.write('removing... '+ by_size[j][FILENAME]+' (pages '+str(by_size[j][PAGECOUNT])+')\n')
             
-    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
-    dgroup = to_keep[:]
+    if to_remove != []:
+        updateinfo(options, to_remove, to_keep, logfile) 
+        deletecomics(options, cr, to_remove, logfile)
     
-    return dgroup
+    return to_keep[:]
 
 
 def process_pagecount_largest(options, cr, percentage, dgroup, logfile, test_to_keep):
@@ -226,11 +227,11 @@ def remove_pagecount_fileless(options, cr, dgroup, logfile):
     for comic in to_keep:
         logfile.write('keeping... '+ comic[FILENAME]+' (pages '+str(comic[PAGECOUNT])+')\n')
     
-    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
+    if to_remove != []:
+        updateinfo(options, to_remove, to_keep, logfile) 
+        deletecomics(options, cr, to_remove, logfile)
         
-    dgroup = to_keep[:]  
-    
-    return dgroup
+    return to_keep[:]  
 
     
 
@@ -349,7 +350,9 @@ def keep_covers_all(options, cr, option, dgroup, logfile):
             dgroup.append(comic)
             logfile.write('keeping... '+ comic[FILENAME]+'\n')
     
-    if to_remove != []: deletecomics(options, cr,to_remove, logfile)
+    if to_remove != []:
+        updateinfo(options, to_remove, dgroup, logfile) 
+        deletecomics(options, cr, to_remove, logfile)
     
     del with_covers
     del to_keep
@@ -475,19 +478,71 @@ def process_dups(options, cr, test_to_keep, keep_if_test_is_true, fields, dgroup
                 if i > 0:
                     logfile.write(' ')
                 f = fields[i]
-                logfile.write(field_names[f] + '=' + ToString(comic[f]))
+                logfile.write(FIELD_NAMES[f] + '=' + ToString(comic[f]))
             logfile.write(')')
                 
         logfile.write('\n')
         logfile.flush()
     
-    # Delete boolks
-    if to_remove != []: 
+    # Delete books
+    if to_remove != []:
+        updateinfo(options, to_remove, to_keep, logfile) 
         deletecomics(options, cr, to_remove, logfile)
 
     del to_remove
     
     return to_keep
+
+
+# ================ DELETE COMICS FUNCTION ==========================================================
+
+# Copy missing data from remove files to keep files
+def updateinfo(options, to_remove_files, to_keep_files, logfile):
+    to_remove = []
+    for book in to_remove_files:
+        to_remove.append(dmBookWrapper(book[BOOK]))
+    to_keep = []
+    for book in to_keep_files:
+        to_keep.append(dmBookWrapper(book[BOOK]))
+    
+    for field in FIELDS_TO_UPDATE_INFO:
+        data = None
+        
+        # Get available data
+        for book in to_remove:
+            book_data = getattr(book, field[0])
+            
+            if options["debug"]:
+                logfile.write('  rem: ' + book.FileName + ': ' + field[0] + ' = ' + ToString(book_data) + '\n')
+            
+            if book_data:
+                data = book_data
+                break
+        
+        if not data:
+            continue
+        
+        try:
+            data = field[1](data)
+        except:
+            if options["verbose"]:
+                logfile.write('updating... Could not convert data to correct type ' + field[0] + ' = ' + ToString(data) + '\n')
+            continue
+        
+        # Set in missing books
+        for book in to_keep:
+            book_data = getattr(book, field[0])
+            
+            if options["debug"]:
+                logfile.write('  keep: ' + book.FileName + ': ' + field[0] + ' = ' + ToString(book_data) + '\n')
+            
+            if not book_data:
+                if not options["updateinfo"]:
+                    logfile.write('[simulation] ')
+                logfile.write('updating... ' + book.FileName + ': ' + field[0] + ' = ' + ToString(data) + '\n')
+                
+                if options["updateinfo"]:
+                    setattr(book.raw, field[0], data)
 
 
 # ================ DELETE COMICS FUNCTION ==========================================================

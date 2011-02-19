@@ -32,6 +32,7 @@ from System.IO import Path, Directory, File, FileInfo
 
 MOVEFILES = False
 REMOVEFROMLIB = False
+UPDATEINFO = False
 
 DUPESDIRECTORY = Path.Combine("C:\\","__dupes__")
 
@@ -40,6 +41,7 @@ SIZEMARGIN = 0             # Preserve comics within sizemargin % size
 COVERPAGES = 4             # Minimal number of pages to be considered "covers only"
  
 VERBOSE = False            # Logging level (true/false)
+DEBUG = False              # Logging level (true/false)
 
 
 #
@@ -52,7 +54,14 @@ SCRIPTDIRECTORY = __file__[0:-len("constants.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
 LOGFILE = Path.Combine(DUPESDIRECTORY, "logfile.log")
 (SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,NOTES,FILETYPE,BOOK) = range(13)
-field_names = ['series','number','volume','filename','pages','size','id','cvdb_id','path','tags','notes','type','book']
+FIELD_NAMES = ['series','number','volume','filename','pages','size','id','cvdb_id','path','tags','notes','type','book']
+FIELDS_TO_UPDATE_INFO = [
+        [ 'AlternateCount', lambda x: int(x) ],
+        [ 'AlternateNumber', lambda x: x ],
+        [ 'AlternateSeries', lambda x: x ],
+        [ 'Count', lambda x: int(x) ],
+        [ 'Title', lambda x: x ],
+]
 
 #
 #

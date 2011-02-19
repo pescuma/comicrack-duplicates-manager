@@ -118,7 +118,9 @@ def ProcessDuplicates(books, logfile):
 
     options = {"movefiles":MOVEFILES,
                "removefromlib":REMOVEFROMLIB,
+               "updateinfo":UPDATEINFO,
                "verbose":VERBOSE,
+               "debug":DEBUG,
                "sizemargin":SIZEMARGIN,
                "coverpages":COVERPAGES,
                "c2c_noads_gap":C2C_NOADS_GAP}
@@ -288,6 +290,9 @@ def ProcessDuplicates(books, logfile):
             logfile.write('  _________________\n')
             logfile.flush()
             
+            if options["debug"]:
+                logfile.write('  ' + str(t_rule) + '\n')
+            
             t_rule.append(t_group[:])
             t_rule.append(logfile)
             t_rule.insert(1,ComicRack)
@@ -372,7 +377,7 @@ def LoadRules(logfile, options):
         logfile.write('\tLine ' + str(rule[0]) + ': ' + str(rule[2:]) + '\n')
     logfile.write('\n')
       
-    bool_options = ("movefiles","removefromlib","verbose")
+    bool_options = ("movefiles", "removefromlib", "updateinfo", "verbose", "debug")
     int_options = ("sizemargin", "coverspages", "c2c_noads_gap")
 
     
