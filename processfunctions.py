@@ -417,7 +417,7 @@ def keep_with_words(options, cr, words, items, dgroup, logfile):
     return process_with_words(options, cr, words, items, dgroup, logfile, True)
 
 def remove_with_words(options, cr, words, items, dgroup, logfile):
-    return process_with_words(options, cr, words, items, dgroup, logfile, True)
+    return process_with_words(options, cr, words, items, dgroup, logfile, False)
 
 
 def keep_first(options, cr, dgroup, logfile):
