@@ -103,6 +103,7 @@ def ProcessDuplicates(books, logfile):
         series = b.Series
         if b.Volume:
             series += ' Vol.' + b.Volume
+        series += ' ' + b.Format
         comiclist.append((cleanupseries(series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,b.FileFormat,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
