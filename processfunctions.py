@@ -31,6 +31,8 @@ from utilsbycory import *
 
 from constants import *
 
+PAGESIZE = -1
+
 #
 #
 ##########
@@ -290,13 +292,83 @@ def process_filesize_smallest(options, cr, percentage, dgroup, logfile, test_to_
     def IsToKeep(comic):
         return comic[FILESIZE] <= max_size
             
-    return process_dups(options, cr, IsToKeep, test_to_keep, [FILESIZE, PAGECOUNT], dgroup, logfile)
+    return process_dups(options, cr, IsToKeep, test_to_keep, [FILESIZE], dgroup, logfile)
 
 def keep_filesize_smallest(options, cr, percentage, dgroup, logfile):
     return process_filesize_smallest(options, cr, percentage, dgroup, logfile, True)
 
 def remove_filesize_smallest(options, cr, percentage, dgroup, logfile):
     return process_filesize_smallest(options, cr, percentage, dgroup, logfile, False)
+
+    
+
+# =================== PAGESIZE FUNCTIONS ========================================================
+
+def pagesize(comic):
+    if comic[PAGECOUNT] == 0:
+        return 0
+    else:
+        return comic[FILESIZE] / comic[PAGECOUNT]
+
+def process_pagesize_largest(options, cr, percentage, dgroup, logfile, test_to_keep):
+    ''' Keeps from the 'group' the comic with largest page size
+            dgroup -> list of duplicate comics
+            logfile -> file object   
+            percentage -> a percentage over the size that is used to keep more comics
+            test_to_keep -> True to keep largest, False to remove 
+            '''
+
+    by_size = sorted(dgroup, key=lambda dgroup: pagesize(dgroup), reverse=True) # sorts by filesize of covers
+    min_size = pagesize(by_size[0]) * (1 - percentage/100.0)
+    
+    if options["verbose"]:
+        logfile.write('Filtering all files with page size at least ' + str(min_size) + '\n')
+    
+    def IsToKeep(comic):
+        return pagesize(comic) >= min_size
+            
+    return process_dups(options, cr, IsToKeep, test_to_keep, [FILESIZE, PAGECOUNT, PAGESIZE], dgroup, logfile)
+
+def keep_pagesize_largest(options, cr, percentage, dgroup, logfile):
+    return process_pagesize_largest(options, cr, percentage, dgroup, logfile, True)
+
+def remove_pagesize_largest(options, cr, percentage, dgroup, logfile):
+    return process_pagesize_largest(options, cr, percentage, dgroup, logfile, False)
+
+
+def process_pagesize_smallest(options, cr, percentage, dgroup, logfile, test_to_keep):
+    ''' Keeps from the 'group' the comic with smallest page size
+            dgroup -> list of duplicate comics
+            logfile -> file object
+            percentage -> a percentage over the size that is used to keep more comics
+            test_to_keep -> True to keep smallest, False to remove 
+            '''
+
+    by_size = sorted(dgroup, key=lambda dgroup: pagesize(dgroup), reverse=False) # sorts by filesize of covers
+                         
+    # keep fileless
+    for comic in by_size:
+        if comic[PAGECOUNT] == 0:
+            by_size.remove(comic)
+                         
+    if len(by_size) < 1:
+        max_size = 0
+    else:
+        max_size = pagesize(by_size[0]) * (1 + percentage/100.0)
+    
+    if options["verbose"]:
+        logfile.write('Filtering all files with page size at max ' + str(max_size) + '\n')
+        
+    def IsToKeep(comic):
+        return pagesize(comic) <= max_size
+            
+    return process_dups(options, cr, IsToKeep, test_to_keep, [FILESIZE, PAGECOUNT, PAGESIZE], dgroup, logfile)
+
+def keep_pagesize_smallest(options, cr, percentage, dgroup, logfile):
+    return process_pagesize_smallest(options, cr, percentage, dgroup, logfile, True)
+
+def remove_pagesize_smallest(options, cr, percentage, dgroup, logfile):
+    return process_pagesize_smallest(options, cr, percentage, dgroup, logfile, False)
     
     
     
@@ -478,7 +550,10 @@ def process_dups(options, cr, test_to_keep, keep_if_test_is_true, fields, dgroup
                 if i > 0:
                     logfile.write(' ')
                 f = fields[i]
-                logfile.write(FIELD_NAMES[f] + '=' + ToString(comic[f]))
+                if f == PAGESIZE:
+                    logfile.write('pagesize=' + ToString(pagesize(comic)))
+                else:
+                    logfile.write(FIELD_NAMES[f] + '=' + ToString(comic[f]))
             logfile.write(')')
                 
         logfile.write('\n')
