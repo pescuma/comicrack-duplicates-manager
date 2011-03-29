@@ -48,7 +48,7 @@ DEBUG = False              # Logging level (true/false)
 ############   DON'T MODIFY BELOW THIS LINE ######
 #
 
-VERSION= "0.7"
+VERSION= "0.8"
 
 SCRIPTDIRECTORY = __file__[0:-len("constants.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
