@@ -325,9 +325,9 @@ def ProcessDuplicates(books, logfile):
 
 #### End report
 
-    MessageBox.Show('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n - '+str(len(dupe_groups))+' duplicated groups processed.\n - '+str(len(new_groups))+' duplicated groups remain.\n - '+str(remain_comics)+' comics remain', 'Sucess', MessageBoxButtons.OK, MessageBoxIcon.Information)
+    MessageBox.Show('Script execution completed correctly on: '+ str(len(books))+ ' books.\n - '+str(len(dupe_groups))+' duplicated groups processed.\n - '+str(len(new_groups))+' duplicated groups remain.\n - '+str(remain_comics)+' comics remain', 'Success', MessageBoxButtons.OK, MessageBoxIcon.Information)
     logfile.write('\n\n\n\ ########################################################### \n\n\n')
-    logfile.write('Scritp execution completed correctly on: '+ str(len(books))+ ' books.\n'+str(len(dupe_groups))+' duplicated groups processed.\n'+str(len(new_groups))+' duplicated groups remain..\n'+str(remain_comics)+' comics remain')
+    logfile.write('Script execution completed correctly on: '+ str(len(books))+ ' books.\n'+str(len(dupe_groups))+' duplicated groups processed.\n'+str(len(new_groups))+' duplicated groups remain..\n'+str(remain_comics)+' comics remain')
 
 #### Garbage collecting
 
