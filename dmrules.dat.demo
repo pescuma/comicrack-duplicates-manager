@@ -30,6 +30,8 @@ filesize	keep	largest	10%
 # notes       remove  c2c
 # text        keep    c2c
 # text        remove  c2c
+# scan        keep    abc
+# scan        remove  abc
 # covers      keep    all
 # covers      keep	  some
 # filesize    keep    largest

@@ -1,6 +1,6 @@
 """Extract, format and print information about Python stack traces."""
 
-import linecache
+#import linecache
 import sys
 
 __all__ = ['extract_stack', 'extract_tb', 'format_exception',
@@ -64,9 +64,9 @@ def print_tb(tb, limit=None, file=None):
         name = co.co_name
         _print(file,
                '  File "%s", line %d, in %s' % (filename, lineno, name))
-        linecache.checkcache(filename)
-        line = linecache.getline(filename, lineno, f.f_globals)
-        if line: _print(file, '    ' + line.strip())
+        #linecache.checkcache(filename)
+        #line = linecache.getline(filename, lineno, f.f_globals)
+        #if line: _print(file, '    ' + line.strip())
         tb = tb.tb_next
         n = n+1
 
@@ -96,10 +96,11 @@ def extract_tb(tb, limit = None):
         co = f.f_code
         filename = co.co_filename
         name = co.co_name
-        linecache.checkcache(filename)
-        line = linecache.getline(filename, lineno, f.f_globals)
-        if line: line = line.strip()
-        else: line = None
+        #linecache.checkcache(filename)
+        #line = linecache.getline(filename, lineno, f.f_globals)
+        #if line: line = line.strip()
+        #else: 
+        line = None
         list.append((filename, lineno, name, line))
         tb = tb.tb_next
         n = n+1
@@ -328,10 +329,11 @@ def extract_stack(f=None, limit = None):
         co = f.f_code
         filename = co.co_filename
         name = co.co_name
-        linecache.checkcache(filename)
-        line = linecache.getline(filename, lineno, f.f_globals)
-        if line: line = line.strip()
-        else: line = None
+        #linecache.checkcache(filename)
+        #line = linecache.getline(filename, lineno, f.f_globals)
+        #if line: line = line.strip()
+        #else: 
+        line = None
         list.append((filename, lineno, name, line))
         f = f.f_back
         n = n+1

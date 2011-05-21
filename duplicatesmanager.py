@@ -104,7 +104,7 @@ def ProcessDuplicates(books, logfile):
         if b.Volume:
             series += ' Vol.' + b.Volume
         series += ' ' + b.Format
-        comiclist.append((cleanupseries(series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,b.FileFormat,book))
+        comiclist.append((cleanupseries(series),re.sub(r'^0+','',b.Number),b.Volume,b.FileName,b.PageCount,b.FileSize/1048576.0,b.ID,b.CVDB_ID,b.FilePath,book.Tags,book.Notes,b.FileFormat,b.ScanInformation,book))
 
     logfile.write('Parsing '+str(len(comiclist))+ ' ecomics\n')
 
@@ -183,17 +183,17 @@ def ProcessDuplicates(books, logfile):
         if options["verbose"]:
             for series in sorted(cl.keys()):
                             logfile.write('\t'+series+'\n')
-                
+        
         ''' we now regroup each series looking for dupe issues '''
+        # We need to use a different list or sometimes python duplicates entries
+        temp_cl = {}
         for series in cl.keys():
                 cl[series].sort()
-                        
                 temp_dict = {} 
                 for key, group in groupby(cl[series], lambda x: x[NUMBER]):
                         temp_dict[key] = list(group)
-                        cl[series] = temp_dict
-                                
-        
+                temp_cl[series] = temp_dict
+        cl = temp_cl
                 
         ''' cleaning issues without dupes '''
         remove = []
@@ -489,8 +489,10 @@ known_rules = [
     [ ["tags", "remove"],                 lambda args: ["remove_with_words", args, [TAGS]] ],
     [ ["notes", "keep"],                  lambda args: ["keep_with_words", args, [NOTES]] ],
     [ ["notes", "remove"],                lambda args: ["remove_with_words", args, [NOTES]] ],
-    [ ["text", "keep"],                   lambda args: ["keep_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES]] ],
-    [ ["text", "remove"],                 lambda args: ["remove_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES]] ],
+    [ ["text", "keep"],                   lambda args: ["keep_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES, SCAN]] ],
+    [ ["text", "remove"],                 lambda args: ["remove_with_words", args, [FILENAME, FILEPATH, TAGS, NOTES, SCAN]] ],
+    [ ["scan", "keep"],                   lambda args: ["keep_with_words", args, [SCAN]] ],
+    [ ["scan", "remove"],                 lambda args: ["remove_with_words", args, [SCAN]] ],
     [ ["filetype", "keep"],               lambda args: ["keep_with_words", args, [FILETYPE]] ],
     [ ["filetype", "remove"],             lambda args: ["remove_with_words", args, [FILETYPE]] ],
     [ ["keep", "first"],                  lambda args: ["keep_first"] ],

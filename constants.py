@@ -53,8 +53,8 @@ VERSION= "0.8"
 SCRIPTDIRECTORY = __file__[0:-len("constants.py")]
 RULESFILE = Path.Combine(SCRIPTDIRECTORY, "dmrules.dat")
 LOGFILE = Path.Combine(DUPESDIRECTORY, "logfile.log")
-(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,NOTES,FILETYPE,BOOK) = range(13)
-FIELD_NAMES = ['series','number','volume','filename','pages','size','id','cvdb_id','path','tags','notes','type','book']
+(SERIES,NUMBER,VOLUME,FILENAME,PAGECOUNT,FILESIZE,ID,CVDB_ID,FILEPATH,TAGS,NOTES,FILETYPE,SCAN,BOOK) = range(14)
+FIELD_NAMES = ['series','number','volume','filename','pages','size','id','cvdb_id','path','tags','notes','type','scan','book']
 FIELDS_TO_UPDATE_INFO = [
         [ 'AlternateCount', lambda x: int(x) ],
         [ 'AlternateNumber', lambda x: x ],
