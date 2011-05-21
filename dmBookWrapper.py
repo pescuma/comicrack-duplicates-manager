@@ -2,7 +2,7 @@
 ##
 ##      BookWrapper.py - part of duplicatemanager, a script for comicrack
 ##
-##      Author: Pescuma Domenecci , modified by perezmu
+##      Author: Ricardo Pescuma Domenecci , modified by perezmu
 ##
 ##      Orignally from pescumas' series info panel script. 
 ##

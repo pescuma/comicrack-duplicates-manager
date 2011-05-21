@@ -2,7 +2,7 @@
 ##
 ##      duplicatesmanager.py - a script for comicrack
 ##
-##      Author: perezmu
+##      Author: perezmu, pescuma
 ##
 ##      Copyleft perezmu 2011. 
 ##

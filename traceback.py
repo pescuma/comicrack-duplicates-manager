@@ -1,4 +1,5 @@
 """Extract, format and print information about Python stack traces."""
+# Modified to remove linecache dependency 
 
 #import linecache
 import sys
